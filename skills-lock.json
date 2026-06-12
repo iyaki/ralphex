@@ -16,11 +16,6 @@
       "sourceType": "github",
       "computedHash": "b122f4d1e91aa1d83027e050b5b37c3156203ee85458d7b1360bc48167c9e02a"
     },
-    "spec-creator": {
-      "source": "iyaki/ralphex",
-      "sourceType": "github",
-      "computedHash": "f9bb9884230313ba4a62ecc4d6a299b85c9df4584c40b80504f6f43d90defff8"
-    },
     "test-driven-development": {
       "source": "obra/superpowers",
       "sourceType": "github",
