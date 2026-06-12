@@ -81,11 +81,8 @@
 		// 	"version": "1.25",
 		// 	"golangciLintVersion": "latest"
 		// },
-		"ghcr.io/devcontainers-extra/features/shfmt:1": {},
-		"ghcr.io/devcontainers-extra/features/npm-packages:1": {
-			"packages": "repomix"
-		},
-		"ghcr.io/devcontainers-extra/features/opencode:1": {},
+		"ghcr.io/devcontainers-extra/features/shfmt:": {},
+		"ghcr.io/devcontainers-extra/features/opencode:": {},
 		"ghcr.io/iyaki/devcontainer-features/lefthook:": {}
 	},
 
