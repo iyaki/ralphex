@@ -6,7 +6,6 @@
 
 	"runArgs": [
 		"--env-file", "${localWorkspaceFolder}/.env",
-		"--userns=keep-id", // For podman users, to avoid permission issues with bind mountson on rootless mode.
 		"--memory", "8g"
 	],
 
@@ -39,7 +38,12 @@
 			"source": "${localWorkspaceFolder}/.devcontainer/pull-git-lfs-artifacts-override.sh",
 			"target": "/usr/local/share/pull-git-lfs-artifacts.sh",
 			"type": "bind"
-		}
+		},
+		{
+      "source": "${localEnv:HOME}/.omp",
+      "target": "/home/codespace/.omp",
+      "type": "bind"
+    }
 	],
 
 	"remoteEnv": {
@@ -83,6 +87,7 @@
 		// },
 		"ghcr.io/devcontainers-extra/features/shfmt:": {},
 		"ghcr.io/devcontainers-extra/features/opencode:": {},
+		"ghcr.io/iyaki/devcontainer-features/oh-my-pi:": {},
 		"ghcr.io/iyaki/devcontainer-features/lefthook:": {}
 	},
 
