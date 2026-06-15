@@ -29,7 +29,8 @@ Thumbs.db
 /package-lock.json
 /node_modules
 /repomix-output.xml
-report.json
+cobertura.xml
+
 gremlins-output.json
 *.tmp
 /oom

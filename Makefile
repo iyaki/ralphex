@@ -1,6 +1,6 @@
 # Makefile for Ralph Go CLI
 
-.PHONY: all build clean install test test-e2e test-coverage deps help quality format lint security arch run
+.PHONY: all build clean install test test-e2e test-coverage coverage cobertura deps help quality format lint security arch run
 
 BINARY_NAME=ralph
 GO=go
@@ -53,16 +53,24 @@ test-e2e:
 # Run coverage gate
 coverage: test-coverage
 
+# Coverage output file — kept between targets for CI upload
+COVERAGE_OUT ?= coverage.out
+
 # Run tests with coverage and enforce minimum threshold
 test-coverage:
-	@coverprofile="$$(mktemp -t quality-cover.XXXXXX)"; \
-	$(GO) test -coverprofile="$$coverprofile" -covermode=atomic ./...; \
-	total="$$($(GO) tool cover -func="$$coverprofile" | awk '/^total:/{gsub(/%/,"",$$3); print $$3}')"; \
-	rm -f "$$coverprofile"; \
-	if ! awk -v total="$$total" -v minimum="90" 'BEGIN {exit !(total >= minimum)}'; then \
+	@cover_status=0; \
+	$(GO) test -coverprofile="$(COVERAGE_OUT)" -covermode=atomic ./... || cover_status=$$?; \
+	total="$$($(GO) tool cover -func="$(COVERAGE_OUT)" | awk '/^total:/{gsub(/%/,"",$$3); print $$3}')"; \
+	if awk -v total="$$total" -v minimum="90" 'BEGIN {exit !(total >= minimum)}'; then \
+		exit $$cover_status; \
+	else \
 		echo "Coverage $${total}% is below required 90%." >&2; \
 		exit 1; \
 	fi
+
+# Convert Go coverage profile to Cobertura XML for upload-code-coverage action
+cobertura:
+	gocover-cobertura < $(COVERAGE_OUT) > cobertura.xml
 
 test-race:
 	$(GO) test -race ./...

@@ -37,14 +37,29 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
           go-version: "~1.25"
-      - name: coverage gate
+      - name: Install coverage converter
+        run: go install github.com/t-yuki/gocover-cobertura@latest
+      - name: Generate coverage and enforce threshold
         if: ${{ hashFiles('**/*.go') != '' }}
         run: make coverage
+      - name: Convert to Cobertura XML
+        if: ${{ hashFiles('**/*.go') != '' }}
+        run: gocover-cobertura < coverage.out > cobertura.xml
+      - name: Upload code coverage
+        if: ${{ hashFiles('**/*.go') != '' }}
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: cobertura.xml
+          language: Go
+          label: code-coverage/go
 
   arch:
     runs-on: ubuntu-latest
