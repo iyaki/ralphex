@@ -25,6 +25,7 @@ Design docs and technical specifications
 - [agents/opencode.md](agents/opencode.md)
 - [agents/claude.md](agents/claude.md)
 - [agents/cursor.md](agents/cursor.md)
+- [agents/oh-my-pi.md](agents/oh-my-pi.md)
 - [init-command.md](init-command.md)
 - [run-command.md](run-command.md)
 - [config-by-prompt.md](config-by-prompt.md)

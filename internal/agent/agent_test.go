@@ -115,6 +115,7 @@ func TestGetAgentReturnsExpectedType(t *testing.T) {
 		agentName string
 		expected  string
 	}{
+		{name: "omp", agentName: "omp", expected: "omp"},
 		{name: "claude", agentName: "claude", expected: "claude"},
 		{name: "cursor", agentName: "cursor", expected: "cursor"},
 		{name: "opencode", agentName: "opencode", expected: "opencode"},
@@ -149,6 +150,7 @@ func TestGetAgentCapturesEnvironmentSnapshot(t *testing.T) {
 		agentName string
 		command   string
 	}{
+		{name: "omp", agentName: "omp", command: "omp"},
 		{name: "opencode", agentName: "opencode", command: "opencode"},
 		{name: "claude", agentName: "claude", command: "claude"},
 		{name: "cursor", agentName: "cursor", command: "cursor"},
@@ -283,30 +285,30 @@ func TestCursorExecuteAndAvailability(t *testing.T) {
 	}
 }
 
-func TestOpencodeExecuteAndAvailability(t *testing.T) {
+func TestOmpExecuteAndAvailability(t *testing.T) {
 	tmp := t.TempDir()
-	writeExecutable(t, tmp, "opencode", "#!/bin/sh\necho \"open:$*\"\n")
+	writeExecutable(t, tmp, "omp", "#!/bin/sh\necho \"omp:$*\"\n")
 	t.Setenv("PATH", tmp)
 
-	a := &agent.OpencodeAgent{Model: "m3", AgentMode: "reviewer"}
+	a := &agent.OmpAgent{Model: "m4"}
 	if !a.IsAvailable() {
-		t.Fatal("expected opencode to be available")
+		t.Fatal("expected omp to be available")
 	}
-	if a.Name() != "opencode" {
+	if a.Name() != "omp" {
 		t.Fatalf("unexpected name: %s", a.Name())
 	}
 
-	result, err := a.Execute("work", &bytes.Buffer{})
+	result, err := a.Execute("prompt", &bytes.Buffer{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if !strings.Contains(result, "open:run --model m3 --agent reviewer work") {
+	if !strings.Contains(result, "omp:launch --print --model m4 prompt") {
 		t.Fatalf("unexpected result: %q", result)
 	}
 
 	t.Setenv("PATH", t.TempDir())
 	if a.IsAvailable() {
-		t.Fatal("expected opencode to be unavailable")
+		t.Fatal("expected omp to be unavailable")
 	}
 }
 
@@ -316,6 +318,13 @@ func TestAllAgentsExecuteWithProvidedEnvironment(t *testing.T) {
 		command   string
 		executeFn func(prompt string, output io.Writer) (string, error)
 	}{
+		{
+			name:    "omp",
+			command: "omp",
+			executeFn: (&agent.OmpAgent{
+				Env: []string{"OVERRIDE_ME=from-agent"},
+			}).Execute,
+		},
 		{
 			name:    "opencode",
 			command: "opencode",
@@ -364,6 +373,11 @@ func TestOpencodeExecuteStreamsOutputInRealTime(t *testing.T) {
 func TestCursorExecuteStreamsOutputInRealTime(t *testing.T) {
 	a := &agent.CursorAgent{}
 	testAgentExecutionStreamsOutputInRealTime(t, "cursor", a.Execute)
+}
+
+func TestOmpExecuteStreamsOutputInRealTime(t *testing.T) {
+	a := &agent.OmpAgent{}
+	testAgentExecutionStreamsOutputInRealTime(t, "omp", a.Execute)
 }
 
 func parseEnvironmentEntries(t *testing.T, entries []string) map[string]string {

@@ -22,6 +22,7 @@ It wraps a supported agent CLI in a repeatable loop: resolve a prompt, run the a
 
 | Agent | Binary |
 | --- | --- |
+| Oh My Pi | `omp` |
 | OpenCode | `opencode` |
 | Claude Code | `claude` |
 | Cursor | `cursor` |

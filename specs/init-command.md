@@ -169,7 +169,7 @@ specs/
 
 | Prompt                                    | Config key                 | Type    | Default                  | Validation                      |
 | ----------------------------------------- | -------------------------- | ------- | ------------------------ | ------------------------------- |
-| AI agent (`opencode`, `claude`, `cursor`) | `agent`                    | select  | `opencode`               | Must be one of supported agents |
+| AI agent (`omp`, `opencode`, `claude`, `cursor`) | `agent`                    | select  | `opencode`               | Must be one of supported agents |
 | Model (optional)                          | `model`                    | input   | empty                    | Free text; empty allowed        |
 | Agent mode/sub-agent (optional)           | `agent-mode`               | input   | empty                    | Free text; empty allowed        |
 | Maximum iterations                        | `max-iterations`           | input   | `25`                     | Integer > 0                     |

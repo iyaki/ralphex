@@ -14,7 +14,7 @@ Status: Implemented
 - Support multiple environment variable overrides in config files.
 - Support repeatable CLI flags for per-run environment variable overrides.
 - Ensure flag-provided values override config-provided values for the same key.
-- Apply overrides consistently across all supported agents (`opencode`, `claude`, `cursor`).
+- Apply overrides consistently across all supported agents (`omp`, `opencode`, `claude`, `cursor`).
 
 ### Non-Goals
 

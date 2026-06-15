@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Create symlinks for all supported agents to point to our test agent.
-	for _, agentName := range []string{"opencode", "claude", "cursor"} {
+	for _, agentName := range []string{"omp", "opencode", "claude", "cursor"} {
 		if err := os.Symlink(agentPath, filepath.Join(tmpDir, agentName)); err != nil {
 			fmt.Fprintf(os.Stderr, "failed to symlink %s to test agent: %v\n", agentName, err)
 			os.Exit(1)

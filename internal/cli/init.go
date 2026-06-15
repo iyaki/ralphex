@@ -71,7 +71,7 @@ const (
 	questionKeyWriteConfiguration     = "write-configuration"
 )
 
-var supportedInitAgents = []string{"opencode", "claude", "cursor"}
+var supportedInitAgents = []string{"omp", "opencode", "claude", "cursor"}
 
 var errInvalidConfirmAnswer = errors.New("please answer yes or no")
 
