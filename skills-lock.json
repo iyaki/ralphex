@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "8d55f17079e56f91df0af691bd5f6712f5fc53fef2f6a8d7fd6143ea39645b21"
     },
+    "spec-creator": {
+      "source": "iyaki/ralphex",
+      "sourceType": "github",
+      "computedHash": "eb406e3d5b902e98debaafcb34bd0d241c89bbefe9dd183db3ba540a163493af"
+    },
     "skill-creator": {
       "source": "anthropics/skills",
       "sourceType": "github",
