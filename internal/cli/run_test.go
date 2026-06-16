@@ -97,5 +97,3 @@ func TestRunCommandExecuteInitAsPrompt(t *testing.T) {
 		t.Fatalf("expected prompt not found error, got: %v", err)
 	}
 }
-
-

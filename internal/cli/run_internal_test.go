@@ -40,10 +40,10 @@ func TestReadBoolFlagOverrideTracksExplicitTrue(t *testing.T) {
 
 func TestApplyBoolFlagOverridesAppliesOnlyChangedFlags(t *testing.T) {
 	tests := []struct {
-		name                 string
-		initialLogTruncate   bool
-		logTruncateOverride  boolFlagOverride
-		expectedLogTruncate  bool
+		name                string
+		initialLogTruncate  bool
+		logTruncateOverride boolFlagOverride
+		expectedLogTruncate bool
 	}{
 		{
 			name:               "changed",

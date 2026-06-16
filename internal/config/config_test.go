@@ -86,7 +86,6 @@ func assertDefaultLoggingFields(t *testing.T, c *config.Config) {
 	}
 }
 
-
 func TestLoadConfigPrecedence(t *testing.T) {
 	dir := t.TempDir()
 	configFile := filepath.Join(dir, "ralph.toml")

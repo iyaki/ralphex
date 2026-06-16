@@ -40,7 +40,6 @@ func NewRunCommand() *cobra.Command {
 func runCommandLogic(cmd *cobra.Command, args []string, cfg *config.Config) error {
 	promptName, scope := parsePositionalArgs(args)
 
-
 	logTruncateOverride, err := readBoolFlagOverride(cmd, "log-truncate")
 	if err != nil {
 		return err

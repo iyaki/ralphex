@@ -690,7 +690,6 @@ func setInitAnswerPromptsDir(answers *InitAnswers, value string) error {
 	return nil
 }
 
-
 func setInitAnswerLogFile(answers *InitAnswers, value string) error {
 	answers.LogFile = value
 

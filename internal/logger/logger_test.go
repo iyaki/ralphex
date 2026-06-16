@@ -24,7 +24,6 @@ func TestNewLoggerDisabledWhenLogFileEmpty(t *testing.T) {
 	}
 }
 
-
 func TestNewLoggerCreatesAndAppendsFile(t *testing.T) {
 	dir := t.TempDir()
 	logPath := filepath.Join(dir, "logs", "ralph.log")
@@ -102,7 +101,6 @@ func TestNewLoggerTruncateCreatesSecureFilePermissions(t *testing.T) {
 		t.Fatalf("expected log permissions 0600, got %04o", got)
 	}
 }
-
 
 func TestCloseWithoutFile(t *testing.T) {
 	l := &logger.Logger{}
