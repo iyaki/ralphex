@@ -31,10 +31,10 @@ Status: Implemented
 ```
 internal/
   agent/
-    ohmy-pi.go
+    oh-my-pi.go
 specs/
   agents/
-    ohmy-pi.md
+    oh-my-pi.md
 ```
 
 ### Component diagram (ASCII)
