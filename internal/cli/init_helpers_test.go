@@ -3,9 +3,9 @@ package cli
 
 import (
 	"bytes"
+	"io"
 	"os"
 	"strings"
-	"io"
 	"testing"
 
 	"github.com/BurntSushi/toml"
@@ -641,9 +641,9 @@ func TestPromptForAnswerWithReader(t *testing.T) {
 			Writer: &bytes.Buffer{},
 		}
 		question := InitQuestion{
-			Key:  "agent",
+			Key:    "agent",
 			Prompt: "Which agent?",
-			Type: "input",
+			Type:   "input",
 		}
 		reader := &mockAnswerReader{answers: []string{"opencode"}}
 
@@ -661,9 +661,9 @@ func TestPromptForAnswerWithReader(t *testing.T) {
 			Writer: &bytes.Buffer{},
 		}
 		question := InitQuestion{
-			Key:  "confirm",
+			Key:    "confirm",
 			Prompt: "Continue?",
-			Type: "confirm",
+			Type:   "confirm",
 		}
 		// First invalid, then valid
 		reader := &mockAnswerReader{answers: []string{"invalid", "yes"}}
@@ -702,7 +702,7 @@ func TestAskSingleQuestionWithReader(t *testing.T) {
 			Writer: &bytes.Buffer{},
 		}
 		question := InitQuestion{
-			Prompt: "Test?",
+			Prompt:       "Test?",
 			DefaultValue: "default-value",
 		}
 		reader := &mockAnswerReader{answers: []string{""}}

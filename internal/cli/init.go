@@ -787,3 +787,18 @@ func buildConfigFromAnswers(answers *InitAnswers) *config.Config {
 		LogTruncate:            answers.LogTruncate,
 	}
 }
+
+// ExecuteInitCommandForTest exports executeInitCommand for testing.
+func ExecuteInitCommandForTest(cmd *cobra.Command, outputPath string, force bool) error {
+	return executeInitCommand(cmd, outputPath, force)
+}
+
+// SetIsInteractiveTerminalForTest overrides isInteractiveTerminal for testing.
+func SetIsInteractiveTerminalForTest(value bool) {
+	isInteractiveTerminal = func() bool { return value }
+}
+
+// GetIsInteractiveTerminalForTest returns the current isInteractiveTerminal function for testing.
+func GetIsInteractiveTerminalForTest() bool {
+	return isInteractiveTerminal()
+}
