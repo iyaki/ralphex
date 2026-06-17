@@ -54,7 +54,7 @@ specs/
 
 1. Ralph selects `omp` when `AgentName` is `omp`.
 2. The agent builds CLI args based on `Model` and `AgentMode`.
-3. The agent executes `omp launch --print ... <prompt>` and returns output.
+3. The agent executes `omp --print --no-title ... <prompt>` and returns output.
 
 ## Data model
 
@@ -77,7 +77,7 @@ specs/
 
 ### Execute omp (happy path)
 
-1. Build args: `launch`, `--print`, optional `--model <model>`, `<prompt>`.
+1. Build args: `--print`, `--no-title`, optional `--model <model>`, `<prompt>`.
 2. Execute `omp` CLI.
 3. Stream stdout/stderr and return combined output.
 
@@ -118,7 +118,7 @@ specs/
 
 ## Verifications
 
-- `ralph --agent omp build` invokes `omp launch --print`.
+- `ralph --agent omp build` invokes `omp --print`.
 - `ralph --agent omp --model gpt-5.3-codex build` includes `--model gpt-5.3-codex`.
 
 ## Appendices
@@ -126,5 +126,5 @@ specs/
 ### Invocation
 
 ```
-omp launch --print [--model <model>] <prompt>
+omp --print [--model <model>] <prompt>
 ```
