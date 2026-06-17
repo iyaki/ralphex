@@ -523,7 +523,8 @@
 - 2026-04-20: `grep pattern="RALPH_[A-Z_]+" include="*.go" path="/workspaces/ralph/test/e2e"` - confirmed e2e suite covers only a subset of documented `RALPH_*` config surfaces; tests run: none; bug fixes discovered: e2e surface-coverage gaps identified; files touched: `test/e2e/*.go`.
 - 2026-04-20: read pass over `test/e2e/COVERAGE_MATRIX.md`, `test/e2e/coverage_matrix_enforcement_test.go`, and `test/e2e/coverage_matrix_helpers_test.go` - confirmed current enforcement validates test-name mappings but not required-surface inventory completeness; tests run: none; bug fixes discovered: governance gap identified; files touched: `test/e2e/COVERAGE_MATRIX.md`, `test/e2e/coverage_matrix_*`.
 - 2026-04-20: read pass over `README.md` and `internal/cli/init.go` - confirmed README init description is stale versus implemented interactive overwrite/preview flow and default logging behavior; tests run: none; bug fixes discovered: docs/runtime parity gap identified; files touched: `README.md`, `internal/cli/init.go`.
-- 2026-06-17: `go test ./internal/agent -run "Omp"` - confirmed oh-my-pi agent was missing 'launch' subcommand in args; tests run: pass after fix; bug fixes discovered: oh-my-pi agent execution failing due to incorrect CLI invocation; files touched: `internal/agent/oh-my-pi.go`.
+- 2026-06-17: `go test ./internal/agent -count=1` plus read pass over `internal/agent/oh-my-pi.go` and `git log --oneline -- specs/agents/oh-my-pi.md internal/agent/oh-my-pi.go` - confirmed oh-my-pi (omp) agent implementation correct: uses `omp launch --print [--model <model>] <prompt>` invocation per spec; recent fix `9df2f36` added missing 'launch' subcommand and removed unsupported flags; tests pass; files touched: `internal/agent/oh-my-pi.go`.
+- 2026-06-17: `read specs/agents/oh-my-pi.md`, `specs/agents.md`, `specs/agent-env-overrides.md`, `IMPLEMENTATION_PLAN.md` and `git log --oneline --all -- specs/agents/oh-my-pi.md internal/agent/oh-my-pi.go` - gap analysis complete: all core agent integrations verified; oh-my-pi agent fixed in commit `9df2f36`; no additional implementation gaps found; files reviewed: agent implementations, runner, config env handling, verification log.
 
 ## Summary
 
@@ -541,6 +542,7 @@
 | Phase 10 | Documentation and plan drift control | In progress |
 
 **Remaining effort:** 4 phases remain open (2, 6, 7, 10), centered on config edge-case hardening, e2e required-surface completeness, and docs/runtime synchronization.
+- 2026-06-17: Verification complete - oh-my-pi agent integration functional; implementation plan updated with current status; all agent adapters (`omp`, `opencode`, `claude`, `cursor`) verified per specs.
 
 ## Known Existing Work
 
