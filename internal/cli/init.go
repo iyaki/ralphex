@@ -336,12 +336,12 @@ func seedInitStringDefaults(answers *InitAnswers, existingConfig *config.Config)
 		apply func(string)
 	}{
 		{existingConfig.Model, func(value string) { answers.Model = value }},
-		{existingConfig.AgentMode, func(value string) { answers.AgentMode = value }},
+		// AgentMode intentionally omitted - always shows no default
 		{existingConfig.SpecsDir, func(value string) { answers.SpecsDir = value }},
 		{existingConfig.SpecsIndexFile, func(value string) { answers.SpecsIndexFile = value }},
 		{existingConfig.ImplementationPlanName, func(value string) { answers.ImplementationPlanName = value }},
 		{existingConfig.PromptsDir, func(value string) { answers.PromptsDir = value }},
-		{existingConfig.LogFile, func(value string) { answers.LogFile = value }},
+		// LogFile intentionally omitted - always shows no default
 	} {
 		if strings.TrimSpace(field.value) == "" {
 			continue

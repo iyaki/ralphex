@@ -278,33 +278,31 @@ func seededInitConfigLines() []string {
 	return []string{
 		`agent = "claude"`,
 		`model = "gpt-4o-mini"`,
-		`agent-mode = "planner"`,
 		"max-iterations = 7",
 		`specs-dir = "docs/specs"`,
 		`specs-index-file = "INDEX.md"`,
 		`implementation-plan-name = "PLAN.md"`,
 		`prompts-dir = ".ralph/custom-prompts"`,
-		`log-file = "./logs/custom.log"`,
 		"log-truncate = true",
 	}
 }
 
 func seededInitPromptDefaults() []string {
 	return []string{
+		"Overwrite existing configuration? [no]:",
 		"AI agent (opencode/claude/cursor) [claude]:",
 		"Model (optional) [gpt-4o-mini]:",
-		"Agent mode/sub-agent (optional) [planner]:",
+		"Agent mode/sub-agent (optional):",
 		"Maximum iterations [7]:",
 		"Specs directory [docs/specs]:",
 		"Specs index file [INDEX.md]:",
 		"Implementation plan file [PLAN.md]:",
 		"Prompts directory [.ralph/custom-prompts]:",
-		"Log file path (optional) [./logs/custom.log]:",
-		"Truncate log file on each run? [yes]:",
+		"Log file path (optional):",
+		"Configuration preview:",
 		"Write configuration now? [yes]:",
 	}
 }
-
 func assertOutputContainsAll(t *testing.T, output string, expectedFragments []string) {
 	t.Helper()
 
@@ -471,5 +469,130 @@ func TestIsInteractiveTerminalRejectsDevNullStreams(t *testing.T) {
 
 	if isInteractiveTerminal() {
 		t.Fatal("expected non-interactive terminal check for /dev/null streams")
+	}
+}
+
+func TestAskSingleQuestionWithReaderSuccess(t *testing.T) {
+	tmp := t.TempDir()
+
+	cmd, out := setupInteractiveInitCommand(t, tmp)
+	cmd.SetIn(strings.NewReader("yes\n"))
+
+	question := newConfirmQuestion(questionKeyWriteConfiguration, "Write configuration now?", confirmYes)
+	answer, err := askSingleQuestionWithReader(&InitSession{
+		Reader: bufio.NewReader(cmd.InOrStdin()),
+		Writer: out,
+	}, question, &bufioAnswerReader{reader: bufio.NewReader(cmd.InOrStdin())})
+
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if answer != "yes" {
+		t.Errorf("expected answer yes, got %q", answer)
+	}
+}
+
+func TestReadBoolFlagOverrideForTest(t *testing.T) {
+	cmd := &cobra.Command{}
+	cmd.Flags().Bool("test-flag", false, "")
+
+	result, err := ReadBoolFlagOverrideForTest(cmd, "test-flag")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if result.Changed {
+		t.Error("expected Changed=false")
+	}
+	if result.Value {
+		t.Error("expected Value=false")
+	}
+}
+
+func TestReadEnvFlagOverridesForTest(t *testing.T) {
+	cmd := &cobra.Command{}
+	cmd.Flags().StringArray("env", []string{}, "")
+	if err := cmd.Flags().Set("env", "KEY=value"); err != nil {
+		t.Fatalf("failed to set flag: %v", err)
+	}
+
+	result, err := ReadEnvFlagOverridesForTest(cmd)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if result["KEY"] != "value" {
+		t.Errorf("expected KEY=value, got %v", result)
+	}
+}
+
+func TestAskQuestionsSuccess(t *testing.T) {
+	tmp := t.TempDir()
+	cmd, out := setupInteractiveInitCommand(t, tmp)
+	cmd.SetIn(strings.NewReader("test-answer\n"))
+
+	session := &InitSession{
+		Reader:  bufio.NewReader(cmd.InOrStdin()),
+		Writer:  out,
+		Answers: &InitAnswers{},
+	}
+
+	questions := []InitQuestion{
+		newInputQuestion(questionKeyModel, "Model", "", false, nil),
+	}
+
+	err := askQuestions(session, questions)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if session.Answers.Model != "test-answer" {
+		t.Errorf("expected Model to be test-answer, got %q", session.Answers.Model)
+	}
+}
+
+func TestStandardQuestionnaireRunnerAskQuestions(t *testing.T) {
+	tmp := t.TempDir()
+	cmd, out := setupInteractiveInitCommand(t, tmp)
+	cmd.SetIn(strings.NewReader("answer1\nanswer2\n"))
+
+	session := &InitSession{
+		Reader:  bufio.NewReader(cmd.InOrStdin()),
+		Writer:  out,
+		Answers: &InitAnswers{},
+	}
+
+	runner := &standardQuestionnaireRunner{}
+	questions := []InitQuestion{
+		newInputQuestion(questionKeyModel, "Model", "", false, nil),
+		newInputQuestion(questionKeySpecsDir, "Specs dir", "", false, nil),
+	}
+
+	err := runner.AskQuestions(session, questions)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if session.Answers.Model != "answer1" {
+		t.Errorf("expected Model to be answer1, got %q", session.Answers.Model)
+	}
+	if session.Answers.SpecsDir != "answer2" {
+		t.Errorf("expected SpecsDir to be answer2, got %q", session.Answers.SpecsDir)
+	}
+}
+
+func TestAskSingleQuestion(t *testing.T) {
+	tmp := t.TempDir()
+	cmd, out := setupInteractiveInitCommand(t, tmp)
+	cmd.SetIn(strings.NewReader("test-response\n"))
+
+	session := &InitSession{
+		Reader: bufio.NewReader(cmd.InOrStdin()),
+		Writer: out,
+	}
+
+	question := newInputQuestion(questionKeyModel, "Model", "", false, nil)
+	answer, err := askSingleQuestion(session, question)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if answer != "test-response" {
+		t.Errorf("expected answer test-response, got %q", answer)
 	}
 }
