@@ -156,7 +156,7 @@ ralph init --output ./team/ralph.toml
 ralph init --force
 ```
 
-The generated starter config enables logging to `./ralph.log` and sets `prompts-dir = ".ralph/prompts"` so prompt files can live inside the repository.
+The generated starter config disables logging by default (log file is empty). Users can enable logging during the interactive questionnaire by providing a log file path. The default prompts directory is set to `.ralph/prompts` so prompt files can live inside the repository.
 
 ## Prompt Resolution
 

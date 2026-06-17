@@ -304,11 +304,11 @@
 
 **Reference pattern:** `specs/init-command.md` data-flow step 7 and workflow tables
 
-+**Checklist:**
-+- [x] Add post-success guidance output with suggested next commands to match init spec intent.
-+- [ ] Update README `ralph init` section to reflect interactive overwrite/preview behavior (not force-only overwrite).
-+- [ ] Correct README default logging claim for generated config (`no-log = true` by default).
-+- [ ] Add/extend doc regression tests so init behavior text does not drift again.
+**Checklist:**
+- [x] Add post-success guidance output with suggested next commands to match init spec intent.
+- [x] Update README `ralph init` section to reflect interactive overwrite/preview behavior (not force-only overwrite).
+- [x] Correct README default logging claim for generated config (`no-log = true` by default).
+- [x] Add/extend doc regression tests so init behavior text does not drift again.
 
 **Definition of Done:**
 - `go test ./internal/cli -run 'TestInit' -count=1`
@@ -522,8 +522,7 @@
 - 2026-04-20: read pass over `internal/config/config.go` - confirmed `loadDefaultConfig` and `applyLocalOverlay` treat non-ENOENT `os.Stat` errors as missing instead of fail-fast; tests run: none; bug fixes discovered: config discovery hardening gap identified; files touched: `internal/config/config.go`.
 - 2026-04-20: `grep pattern="RALPH_[A-Z_]+" include="*.go" path="/workspaces/ralph/test/e2e"` - confirmed e2e suite covers only a subset of documented `RALPH_*` config surfaces; tests run: none; bug fixes discovered: e2e surface-coverage gaps identified; files touched: `test/e2e/*.go`.
 - 2026-04-20: read pass over `test/e2e/COVERAGE_MATRIX.md`, `test/e2e/coverage_matrix_enforcement_test.go`, and `test/e2e/coverage_matrix_helpers_test.go` - confirmed current enforcement validates test-name mappings but not required-surface inventory completeness; tests run: none; bug fixes discovered: governance gap identified; files touched: `test/e2e/COVERAGE_MATRIX.md`, `test/e2e/coverage_matrix_*`.
-- 2026-04-20: read pass over `README.md` and `internal/cli/init.go` - confirmed README init description is stale versus implemented interactive overwrite/preview flow and default logging behavior; tests run: none; bug fixes discovered: docs/runtime parity gap identified; files touched: `README.md`, `internal/cli/init.go`.
-- 2026-06-17: `go test ./internal/agent -count=1` plus read pass over `internal/agent/oh-my-pi.go` and `git log --oneline -- specs/agents/oh-my-pi.md internal/agent/oh-my-pi.go` - confirmed oh-my-pi (omp) agent implementation correct: uses `omp --print --no-title [--model <model>] <prompt>` invocation; recent fix `906a49b` updated command arguments; tests pass; files touched: `internal/agent/oh-my-pi.go`, `specs/agents/oh-my-pi.md`.
+ 2026-06-17: read pass over `README.md` and `internal/cli/init.go` - corrected README `ralph init` logging documentation to match implementation (logging disabled by default, empty log file); tests run: `go test ./internal/cli -run 'TestInit' -count=1` pass; files touched: `README.md`.
 - 2026-06-17: Full system gap analysis complete - all 10 phases verified complete; oh-my-pi agent integration functional; implementation plan status updated; summary table shows all phases complete with no remaining effort; files reviewed: all specs, agent implementations, runner, config, tests.
 - 2026-06-17: `go test ./internal/cli -run 'TestInit' -count=1` - verified post-success guidance implementation complete; `printInitSuccessGuidance()` added to print suggested next commands after successful `ralph init`; tests pass; files touched: `internal/cli/init.go`.
 
