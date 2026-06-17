@@ -487,3 +487,124 @@ func TestIsInteractiveTerminalRejectsDevNullStreams(t *testing.T) {
 		t.Fatal("expected non-interactive terminal check for /dev/null streams")
 	}
 }
+
+func TestAskSingleQuestionWithReaderSuccess(t *testing.T) {
+	tmp := t.TempDir()
+	cmd, out := setupInteractiveInitCommand(t, tmp)
+	cmd.SetIn(strings.NewReader("yes\n"))
+
+	question := newConfirmQuestion(questionKeyWriteConfiguration, "Write configuration now?", confirmYes)
+	answer, err := askSingleQuestionWithReader(&InitSession{
+		Reader: bufio.NewReader(cmd.InOrStdin()),
+		Writer: out,
+	}, question, &bufioAnswerReader{reader: bufio.NewReader(cmd.InOrStdin())})
+
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if answer != "yes" {
+		t.Errorf("expected answer yes, got %q", answer)
+	}
+}
+
+func TestReadBoolFlagOverrideForTest(t *testing.T) {
+	cmd := &cobra.Command{}
+	cmd.Flags().Bool("test-flag", false, "")
+
+	result, err := ReadBoolFlagOverrideForTest(cmd, "test-flag")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if result.Changed {
+		t.Error("expected Changed=false")
+	}
+	if result.Value {
+		t.Error("expected Value=false")
+	}
+}
+
+func TestReadEnvFlagOverridesForTest(t *testing.T) {
+	cmd := &cobra.Command{}
+	cmd.Flags().StringArray("env", []string{}, "")
+	if err := cmd.Flags().Set("env", "KEY=value"); err != nil {
+		t.Fatalf("failed to set flag: %v", err)
+	}
+
+	result, err := ReadEnvFlagOverridesForTest(cmd)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if result["KEY"] != "value" {
+		t.Errorf("expected KEY=value, got %v", result)
+	}
+}
+
+func TestAskQuestionsSuccess(t *testing.T) {
+	cmd, out := setupInteractiveInitCommand(t, t.TempDir())
+	cmd.SetIn(strings.NewReader("test-answer\n"))
+
+	session := &InitSession{
+		Reader: bufio.NewReader(cmd.InOrStdin()),
+		Writer: out,
+		Answers: &InitAnswers{},
+	}
+
+	questions := []InitQuestion{
+		newInputQuestion(questionKeyModel, "Model", "", false, nil),
+	}
+
+	err := askQuestions(session, questions)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if session.Answers.Model != "test-answer" {
+		t.Errorf("expected Model to be test-answer, got %q", session.Answers.Model)
+	}
+}
+
+func TestStandardQuestionnaireRunnerAskQuestions(t *testing.T) {
+	cmd, out := setupInteractiveInitCommand(t, t.TempDir())
+	cmd.SetIn(strings.NewReader("answer1\nanswer2\n"))
+
+	session := &InitSession{
+		Reader: bufio.NewReader(cmd.InOrStdin()),
+		Writer: out,
+		Answers: &InitAnswers{},
+	}
+	
+	runner := &standardQuestionnaireRunner{}
+	questions := []InitQuestion{
+		newInputQuestion(questionKeyModel, "Model", "", false, nil),
+		newInputQuestion(questionKeySpecsDir, "Specs dir", "", false, nil),
+	}
+
+	err := runner.AskQuestions(session, questions)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if session.Answers.Model != "answer1" {
+		t.Errorf("expected Model to be answer1, got %q", session.Answers.Model)
+	}
+	if session.Answers.SpecsDir != "answer2" {
+		t.Errorf("expected SpecsDir to be answer2, got %q", session.Answers.SpecsDir)
+	}
+}
+
+func TestAskSingleQuestion(t *testing.T) {
+	cmd, out := setupInteractiveInitCommand(t, t.TempDir())
+	cmd.SetIn(strings.NewReader("test-response\n"))
+
+	session := &InitSession{
+		Reader: bufio.NewReader(cmd.InOrStdin()),
+		Writer: out,
+	}
+
+	question := newInputQuestion(questionKeyModel, "Model", "", false, nil)
+	answer, err := askSingleQuestion(session, question)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if answer != "test-response" {
+		t.Errorf("expected answer test-response, got %q", answer)
+	}
+}
