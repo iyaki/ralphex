@@ -215,3 +215,30 @@ func TestWriteConfig_EmptyStringsShouldBeOmitted(t *testing.T) {
 		t.Error("Config file should not write empty custom-prompt field")
 	}
 }
+
+func TestWriteConfig_CannotCreateTempFile(t *testing.T) {
+	tmpDir := t.TempDir()
+	path := filepath.Join(tmpDir, "test.toml")
+	cfg := &config.Config{AgentName: "test"}
+
+	// Make directory read-only to force temp file creation to fail
+	oldMode := uint32(0755)
+	dir := filepath.Dir(path)
+	if err := os.Chmod(dir, os.FileMode(oldMode)); err != nil {
+		t.Fatalf("Chmod failed: %v", err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(dir, os.FileMode(0755)) })
+
+	// Try to write with a non-writable directory
+	// Create a directory that will fail temp file creation
+	badDir := filepath.Join(tmpDir, "readonly")
+	if err := os.MkdirAll(badDir, 0500); err != nil {
+		t.Fatalf("MkdirAll failed: %v", err)
+	}
+	badPath := filepath.Join(badDir, "test.toml")
+
+	err := config.WriteConfig(badPath, cfg)
+	if err == nil {
+		t.Fatal("expected error when temp file creation fails")
+	}
+}

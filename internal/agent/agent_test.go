@@ -116,6 +116,7 @@ func TestGetAgentReturnsExpectedType(t *testing.T) {
 		expected  string
 	}{
 		{name: "omp", agentName: "omp", expected: "omp"},
+		{name: "oh-my-pi", agentName: "oh-my-pi", expected: "omp"},
 		{name: "claude", agentName: "claude", expected: "claude"},
 		{name: "cursor", agentName: "cursor", expected: "cursor"},
 		{name: "opencode", agentName: "opencode", expected: "opencode"},
@@ -302,7 +303,7 @@ func TestOmpExecuteAndAvailability(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if !strings.Contains(result, "omp:launch --print --model m4 prompt") {
+	if !strings.Contains(result, "omp:--print --no-title --model m4 prompt") {
 		t.Fatalf("unexpected result: %q", result)
 	}
 

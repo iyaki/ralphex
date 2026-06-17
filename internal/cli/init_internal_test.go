@@ -607,3 +607,34 @@ func TestAskSingleQuestion(t *testing.T) {
 		t.Errorf("expected answer test-response, got %q", answer)
 	}
 }
+
+func TestInitConfigExistsReturnsErrorOnStatFailure(t *testing.T) {
+	invalidPath := string([]byte{0})
+	_, err := initConfigExists(invalidPath)
+	if err == nil {
+		t.Fatal("expected error for invalid path")
+	}
+}
+
+func TestConfirmInitWriteWithReaderHandlesError(t *testing.T) {
+	session := &InitSession{
+		Answers: &InitAnswers{
+			AgentName:              "claude",
+			Model:                  "claude-sonnet-4-20250514",
+			MaxIterations:          2,
+			SpecsDir:               "specs",
+			SpecsIndexFile:         "README.md",
+			ImplementationPlanName: "IMPLEMENTATION_PLAN.md",
+			PromptsDir:             ".omp/prompts",
+			LogFile:                "",
+			LogTruncate:            true,
+		},
+		Writer: io.Discard,
+		Reader: bufio.NewReader(strings.NewReader("invalid\n")),
+	}
+
+	_, err := confirmInitWriteWithReader(session, &bufioAnswerReader{reader: session.Reader})
+	if err == nil {
+		t.Fatal("expected error for invalid confirm answer")
+	}
+}

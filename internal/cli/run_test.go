@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/iyaki/ralphex/internal/cli"
+	"github.com/iyaki/ralphex/internal/config"
 )
 
 func TestNewRunCommandBasicProperties(t *testing.T) {
@@ -95,5 +96,174 @@ func TestRunCommandExecuteInitAsPrompt(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "prompt file not found for 'init'") {
 		t.Fatalf("expected prompt not found error, got: %v", err)
+	}
+}
+
+func TestReadBoolFlagOverride(t *testing.T) {
+	cmd := cli.NewRunCommand()
+	cmd.Flags().Bool("test-flag", false, "")
+
+	// Flag not changed
+	override, err := cli.ReadBoolFlagOverride(cmd, "test-flag")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if override.Changed {
+		t.Fatal("expected Changed to be false")
+	}
+
+	// Flag changed to true
+	cmd.SetArgs([]string{"--test-flag=true"})
+	if err := cmd.ParseFlags([]string{"--test-flag=true"}); err != nil {
+		t.Fatalf("failed to parse flags: %v", err)
+	}
+	override, err = cli.ReadBoolFlagOverride(cmd, "test-flag")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !override.Changed || !override.Value {
+		t.Fatal("expected Changed=true and Value=true")
+	}
+}
+
+func TestReadEnvFlagOverrides(t *testing.T) {
+	cmd := cli.NewRunCommand()
+
+	// No env flags
+	overrides, err := cli.ReadEnvFlagOverrides(cmd)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if overrides != nil {
+		t.Fatal("expected nil overrides")
+	}
+
+	// With env flags
+	cmd.SetArgs([]string{"--env", "KEY1=value1", "--env", "KEY2=value2"})
+	if err := cmd.ParseFlags([]string{"--env", "KEY1=value1", "--env", "KEY2=value2"}); err != nil {
+		t.Fatalf("failed to parse flags: %v", err)
+	}
+	overrides, err = cli.ReadEnvFlagOverrides(cmd)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if overrides["KEY1"] != "value1" || overrides["KEY2"] != "value2" {
+		t.Fatalf("expected KEY1=value1, KEY2=value2, got %v", overrides)
+	}
+}
+
+func TestReadEnvFlagOverridesInvalidEntry(t *testing.T) {
+	cmd := cli.NewRunCommand()
+	cmd.SetArgs([]string{"--env", "invalid-no-value"})
+	if err := cmd.ParseFlags([]string{"--env", "invalid-no-value"}); err != nil {
+		t.Fatalf("failed to parse flags: %v", err)
+	}
+	_, err := cli.ReadEnvFlagOverridesForTest(cmd)
+	if err == nil {
+		t.Fatal("expected error for invalid env entry")
+	}
+	if !strings.Contains(err.Error(), "expected KEY=VALUE") {
+		t.Fatalf("expected KEY=VALUE error, got %v", err)
+	}
+}
+
+func TestReadEnvFlagOverridesInvalidKey(t *testing.T) {
+	cmd := cli.NewRunCommand()
+	cmd.SetArgs([]string{"--env", "invalid-key=value"})
+	if err := cmd.ParseFlags([]string{"--env", "invalid-key=value"}); err != nil {
+		t.Fatalf("failed to parse flags: %v", err)
+	}
+	_, err := cli.ReadEnvFlagOverridesForTest(cmd)
+	if err == nil {
+		t.Fatal("expected error for invalid env key")
+	}
+	if !strings.Contains(err.Error(), "invalid --env key") {
+		t.Fatalf("expected invalid key error, got %v", err)
+	}
+}
+
+func TestRunLoopReachesMaxIterations(t *testing.T) {
+	tmp := t.TempDir()
+	binDir := t.TempDir()
+	writeExecutable(t, binDir, "opencode", "#!/bin/sh\necho \"no completion signal\"\n")
+	t.Setenv("PATH", binDir)
+	t.Setenv("HOME", tmp)
+
+	cfg := &config.Config{
+		AgentName:     "opencode",
+		Model:         "test-model",
+		MaxIterations: 2,
+		Env:           map[string]string{},
+	}
+
+	var out bytes.Buffer
+	err := cli.RunLoop(cfg, "test-prompt", "test", &out)
+	if err == nil || !strings.Contains(err.Error(), "max iterations reached") {
+		t.Fatalf("expected max iterations error, got %v", err)
+	}
+}
+
+func TestRunLoopDetectsCompletionSignal(t *testing.T) {
+	tmp := t.TempDir()
+	binDir := t.TempDir()
+	writeExecutable(t, binDir, "opencode", "#!/bin/sh\necho \"<promise>COMPLETE</promise>\"\n")
+	t.Setenv("PATH", binDir)
+	t.Setenv("HOME", tmp)
+
+	cfg := &config.Config{
+		AgentName:     "opencode",
+		Model:         "test-model",
+		MaxIterations: 5,
+		Env:           map[string]string{},
+	}
+
+	var out bytes.Buffer
+	err := cli.RunLoop(cfg, "test-prompt", "test", &out)
+	if err != nil {
+		t.Fatalf("expected success with completion signal, got %v", err)
+	}
+}
+
+func TestRunLoopAgentNotAvailable(t *testing.T) {
+	tmp := t.TempDir()
+	t.Setenv("HOME", tmp)
+	t.Setenv("PATH", tmp) // No agents available
+
+	cfg := &config.Config{
+		AgentName:     "opencode",
+		Model:         "test-model",
+		MaxIterations: 1,
+		Env:           map[string]string{},
+	}
+
+	var out bytes.Buffer
+	err := cli.RunLoop(cfg, "test-prompt", "test", &out)
+	// Should complete but warn about agent not found
+	output := out.String()
+	if !strings.Contains(output, "Warning: opencode agent not found") {
+		t.Fatalf("expected agent not found warning, got %q", output)
+	}
+	_ = err // Error expected due to max iterations
+}
+
+func TestHasCompletionSignal(t *testing.T) {
+	tests := []struct {
+		name     string
+		result   string
+		expected bool
+	}{
+		{"contains signal", "some text\n<promise>COMPLETE</promise>\nmore", true},
+		{"no signal", "some text\nmore text", false},
+		{"signal with spaces", "  <promise>COMPLETE</promise>  ", true},
+		{"partial signal", "<promise>COMPLETE", false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := cli.HasCompletionSignal(tc.result, "<promise>COMPLETE</promise>")
+			if result != tc.expected {
+				t.Errorf("expected %v, got %v", tc.expected, result)
+			}
+		})
 	}
 }

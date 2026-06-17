@@ -316,3 +316,23 @@ func setupSharedFlags(cmd *cobra.Command, cfg *config.Config) {
 	flags.StringVar(&cfg.AgentMode, "agent-mode", "", "Agent mode/sub-agent to use (e.g., reviewer, planner)")
 	flags.StringArray("env", nil, "Set/override an agent environment variable (KEY=VALUE). Repeatable")
 }
+
+// ReadBoolFlagOverride exports readBoolFlagOverride for tests.
+func ReadBoolFlagOverride(cmd *cobra.Command, flagName string) (struct{ Changed, Value bool }, error) {
+	ov, err := readBoolFlagOverride(cmd, flagName)
+
+	return struct {
+		Changed bool
+		Value   bool
+	}{Changed: ov.changed, Value: ov.value}, err
+}
+
+// ReadEnvFlagOverrides exports readEnvFlagOverrides for tests.
+func ReadEnvFlagOverrides(cmd *cobra.Command) (map[string]string, error) {
+	return readEnvFlagOverrides(cmd)
+}
+
+// HasCompletionSignal exports hasCompletionSignal for tests.
+func HasCompletionSignal(result, completionSignal string) bool {
+	return hasCompletionSignal(result, completionSignal)
+}

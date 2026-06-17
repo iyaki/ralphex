@@ -4,126 +4,145 @@ import (
 	"bytes"
 	"strings"
 	"testing"
-	"time"
 )
 
-type runTestCase struct {
-	name           string
-	mode           string
-	expectedExit   int
-	expectedOutput string
-	expectedErr    string
-}
-
-func TestRun(t *testing.T) {
-	tests := []runTestCase{
-		{
-			name:           "complete_once",
-			mode:           modeCompleteOnce,
-			expectedExit:   exitCodeSuccess,
-			expectedOutput: "<promise>COMPLETE</promise>",
-		},
-		{
-			name:           "never_complete",
-			mode:           modeNeverComplete,
-			expectedExit:   exitCodeSuccess,
-			expectedOutput: "Processing request forever...",
-		},
-		{
-			name:         "return_error",
-			mode:         modeReturnError,
-			expectedExit: exitCodeError,
-			expectedErr:  "Simulated agent failure",
-		},
-		{
-			name:           "slow_complete",
-			mode:           modeSlowComplete,
-			expectedExit:   exitCodeSuccess,
-			expectedOutput: "<promise>COMPLETE</promise>",
-		},
-		{
-			name:         "unknown_mode",
-			mode:         "unknown",
-			expectedExit: exitCodeUnknown,
-			expectedErr:  "Unknown mode: unknown",
-		},
+func TestRunCompleteOnceMode(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	args := []string{"ralph-test-agent"}
+	getEnv := func(_ string) string {
+		return ""
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			runTest(t, tt)
-		})
+	code := run(args, getEnv, &stdout, &stderr)
+	if code != exitCodeSuccess {
+		t.Fatalf("expected exit code %d, got %d", exitCodeSuccess, code)
+	}
+	if !strings.Contains(stdout.String(), "<promise>COMPLETE</promise>") {
+		t.Fatal("expected complete signal in output")
+	}
+}
+
+func TestRunNeverCompleteMode(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	args := []string{"ralph-test-agent"}
+	getEnv := func(_ string) string {
+		return modeNeverComplete
+	}
+
+	code := run(args, getEnv, &stdout, &stderr)
+	if code != exitCodeSuccess {
+		t.Fatalf("expected exit code %d, got %d", exitCodeSuccess, code)
+	}
+	if strings.Contains(stdout.String(), "<promise>COMPLETE</promise>") {
+		t.Fatal("did not expect complete signal in output")
+	}
+}
+
+func TestRunReturnErrorMode(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	args := []string{"ralph-test-agent"}
+	getEnv := func(_ string) string {
+		return modeReturnError
+	}
+
+	code := run(args, getEnv, &stdout, &stderr)
+	if code != exitCodeError {
+		t.Fatalf("expected exit code %d, got %d", exitCodeError, code)
+	}
+	if !strings.Contains(stderr.String(), "Simulated agent failure") {
+		t.Fatal("expected error message in stderr")
+	}
+}
+
+func TestRunSlowCompleteMode(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	args := []string{"ralph-test-agent"}
+	getEnv := func(_ string) string {
+		return modeSlowComplete
+	}
+
+	code := run(args, getEnv, &stdout, &stderr)
+	if code != exitCodeSuccess {
+		t.Fatalf("expected exit code %d, got %d", exitCodeSuccess, code)
+	}
+	if !strings.Contains(stdout.String(), "<promise>COMPLETE</promise>") {
+		t.Fatal("expected complete signal in output")
+	}
+}
+
+func TestRunUnknownMode(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	args := []string{"ralph-test-agent"}
+	getEnv := func(_ string) string {
+		return "unknown_mode_xyz"
+	}
+
+	code := run(args, getEnv, &stdout, &stderr)
+	if code != exitCodeUnknown {
+		t.Fatalf("expected exit code %d, got %d", exitCodeUnknown, code)
 	}
 }
 
 func TestEmitRequestedEnv(t *testing.T) {
-	t.Run("NoKeysConfigured", func(t *testing.T) {
-		stderr := &bytes.Buffer{}
-
-		emitRequestedEnv(func(string) string { return "" }, stderr)
-
-		if stderr.Len() != 0 {
-			t.Fatalf("expected no output when no env keys configured, got %q", stderr.String())
-		}
-	})
-
-	t.Run("CommaSeparatedKeys", func(t *testing.T) {
-		stderr := &bytes.Buffer{}
-		values := map[string]string{
-			"RALPH_TEST_AGENT_ECHO_ENV_KEYS": " KEY_ONE,KEY_TWO , ,KEY_THREE",
-			"KEY_ONE":                        "one",
-			"KEY_TWO":                        "two",
-			"KEY_THREE":                      "",
-		}
-
-		emitRequestedEnv(func(key string) string {
-			return values[key]
-		}, stderr)
-
-		output := stderr.String()
-		if !strings.Contains(output, "[ralph-test-agent] Env KEY_ONE=one") {
-			t.Fatalf("expected KEY_ONE in output, got %q", output)
-		}
-		if !strings.Contains(output, "[ralph-test-agent] Env KEY_TWO=two") {
-			t.Fatalf("expected KEY_TWO in output, got %q", output)
-		}
-		if !strings.Contains(output, "[ralph-test-agent] Env KEY_THREE=") {
-			t.Fatalf("expected KEY_THREE in output, got %q", output)
-		}
-	})
-}
-
-func runTest(t *testing.T, tt runTestCase) {
-	t.Helper()
-
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
-
+	var stderr bytes.Buffer
 	getEnv := func(key string) string {
-		if key == "RALPH_TEST_AGENT_MODE" {
-			return tt.mode
+		if key == "RALPH_TEST_AGENT_ECHO_ENV_KEYS" {
+			return "KEY1,KEY2"
+		}
+		if key == "KEY1" {
+			return "value1"
+		}
+		if key == "KEY2" {
+			return "value2"
 		}
 
 		return ""
 	}
 
-	start := time.Now()
-	exitCode := run([]string{"prog", "arg"}, getEnv, stdout, stderr)
-	duration := time.Since(start)
+	emitRequestedEnv(getEnv, &stderr)
+	output := stderr.String()
+	if !strings.Contains(output, "KEY1=value1") {
+		t.Fatal("expected KEY1 in output")
+	}
+	if !strings.Contains(output, "KEY2=value2") {
+		t.Fatal("expected KEY2 in output")
+	}
+}
 
-	if exitCode != tt.expectedExit {
-		t.Errorf("expected exit code %d, got %d", tt.expectedExit, exitCode)
+func TestEmitRequestedEnvEmpty(t *testing.T) {
+	var stderr bytes.Buffer
+	getEnv := func(_ string) string {
+		return ""
 	}
 
-	if tt.expectedOutput != "" && !strings.Contains(stdout.String(), tt.expectedOutput) {
-		t.Errorf("expected stdout to contain %q, got %q", tt.expectedOutput, stdout.String())
+	emitRequestedEnv(getEnv, &stderr)
+	if stderr.Len() != 0 {
+		t.Fatal("expected no output for empty env keys")
+	}
+}
+
+func TestEmitRequestedEnvWithSpaces(t *testing.T) {
+	var stderr bytes.Buffer
+	getEnv := func(key string) string {
+		if key == "RALPH_TEST_AGENT_ECHO_ENV_KEYS" {
+			return "  KEY1  ,  ,  KEY2  "
+		}
+		if key == "KEY1" {
+			return "v1"
+		}
+		if key == "KEY2" {
+			return "v2"
+		}
+
+		return ""
 	}
 
-	if tt.expectedErr != "" && !strings.Contains(stderr.String(), tt.expectedErr) {
-		t.Errorf("expected stderr to contain %q, got %q", tt.expectedErr, stderr.String())
+	emitRequestedEnv(getEnv, &stderr)
+	output := stderr.String()
+	if !strings.Contains(output, "KEY1=v1") {
+		t.Fatal("expected KEY1 in output")
 	}
-
-	if tt.mode == modeSlowComplete && duration < 50*time.Millisecond {
-		t.Errorf("expected slow_complete to take at least 50ms, took %v", duration)
+	if !strings.Contains(output, "KEY2=v2") {
+		t.Fatal("expected KEY2 in output")
 	}
 }

@@ -371,3 +371,82 @@ func tomlMetaWithPromptOverrideKey(t *testing.T, key, field string) toml.MetaDat
 
 	return meta
 }
+
+func TestResolveLogTruncate(t *testing.T) {
+	tests := []struct {
+		name      string
+		flagValue bool
+		envValue  string
+		fileValue bool
+		expected  bool
+	}{
+		{"flag true wins", true, "", false, true},
+		{"flag true wins over env", true, "false", false, true},
+		{"env false inverts to true", false, "false", false, true},
+		{"env true inverts to false", false, "true", false, false},
+		{"env invalid falls through to file", false, "invalid", true, true},
+		{"no flag or env uses file", false, "", true, true},
+		{"no flag or env uses file false", false, "", false, false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := resolveLogTruncate(tc.flagValue, tc.envValue, tc.fileValue)
+			if result != tc.expected {
+				t.Errorf("expected %v, got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestMergeScalarsAllFields(t *testing.T) {
+	base := &Config{}
+	overlay := &Config{
+		MaxIterations:  99,
+		NoSpecsIndex:   true,
+		LogTruncate:    true,
+		AgentName:      "omp",
+		Model:          "m4",
+		SpecsDir:       "specs",
+		SpecsIndexFile: "README.md",
+		LogFile:        "ralph.log",
+	}
+	meta := tomlMetaWithKeys(t, "max-iterations", "no-specs-index", "log-truncate",
+		"agent", "model", "specs-dir", "specs-index-file", "log-file")
+
+	mergeScalars(base, overlay, meta)
+
+	if base.MaxIterations != 99 {
+		t.Errorf("expected MaxIterations 99, got %d", base.MaxIterations)
+	}
+	if !base.NoSpecsIndex {
+		t.Error("expected NoSpecsIndex true")
+	}
+	if !base.LogTruncate {
+		t.Error("expected LogTruncate true")
+	}
+	if base.AgentName != "omp" {
+		t.Errorf("expected AgentName 'omp', got %q", base.AgentName)
+	}
+}
+
+func TestMergeScalarsPartialOverlay(t *testing.T) {
+	base := &Config{
+		MaxIterations: 25,
+		AgentName:     "claude",
+		Model:         "sonnet",
+	}
+	overlay := &Config{
+		MaxIterations: 50,
+	}
+	meta := tomlMetaWithKeys(t, "max-iterations")
+
+	mergeScalars(base, overlay, meta)
+
+	if base.MaxIterations != 50 {
+		t.Errorf("expected MaxIterations 50, got %d", base.MaxIterations)
+	}
+	if base.AgentName != "claude" {
+		t.Errorf("expected AgentName to remain 'claude', got %q", base.AgentName)
+	}
+}
