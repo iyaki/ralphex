@@ -238,6 +238,9 @@ func executeInitCommand(cmd *cobra.Command, outputPath string, force bool) error
 	}
 
 	_, _ = fmt.Fprintf(session.Writer, "Initialized Ralphex configuration at %s\n", session.OutputPath)
+	if err := printInitSuccessGuidance(session); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -436,6 +439,17 @@ func printInitPreview(session *InitSession) error {
 	if _, err := fmt.Fprintln(session.Writer); err != nil {
 		return err
 	}
+
+	return nil
+}
+
+// printInitSuccessGuidance prints suggested next commands after successful init.
+func printInitSuccessGuidance(session *InitSession) error {
+	_, _ = fmt.Fprintln(session.Writer)
+	_, _ = fmt.Fprintln(session.Writer, "Next steps:")
+	_, _ = fmt.Fprintf(session.Writer, "  ralph plan <scope>        # Generate or refresh implementation plan\n")
+	_, _ = fmt.Fprintf(session.Writer, "  ralph build               # Run the build loop\n")
+	_, _ = fmt.Fprintf(session.Writer, "  ralph --help              # Learn about more options\n")
 
 	return nil
 }
