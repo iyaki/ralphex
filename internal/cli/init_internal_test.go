@@ -107,6 +107,20 @@ func TestInitCommandWritesDefaultConfigFile(t *testing.T) {
 	if !strings.Contains(contentText, `agent = "opencode"`) {
 		t.Fatalf("expected config to include default agent, got %q", contentText)
 	}
+	
+	// Verify empty optional fields are omitted
+	if strings.Contains(contentText, `log-file`) {
+		t.Errorf("empty log-file should be omitted, got %q", contentText)
+	}
+	if strings.Contains(contentText, `log-truncate`) {
+		t.Errorf("false log-truncate should be omitted, got %q", contentText)
+	}
+	if strings.Contains(contentText, `model = ""`) {
+		t.Errorf("empty model should be omitted, got %q", contentText)
+	}
+	if strings.Contains(contentText, `agent-mode = ""`) {
+		t.Errorf("empty agent-mode should be omitted, got %q", contentText)
+	}
 }
 
 func TestInitCommandWritesConfigToOutputPath(t *testing.T) {
@@ -135,7 +149,7 @@ func TestInitCommandAsksQuestionsInSpecifiedOrder(t *testing.T) {
 	}
 
 	assertOutputContainsPromptsInOrder(t, out.String(), []string{
-		"AI agent (opencode/claude/cursor)",
+		"AI agent (omp/opencode/claude/cursor/oh-my-pi)",
 		"Model (optional)",
 		"Agent mode/sub-agent (optional)",
 		"Maximum iterations",
@@ -143,7 +157,7 @@ func TestInitCommandAsksQuestionsInSpecifiedOrder(t *testing.T) {
 		"Specs index file",
 		"Implementation plan file",
 		"Prompts directory",
-		"Log file path (optional)",
+		"Log file path (leave empty to disable logging)",
 		"Write configuration now?",
 	})
 }
@@ -278,29 +292,28 @@ func seededInitConfigLines() []string {
 	return []string{
 		`agent = "claude"`,
 		`model = "gpt-4o-mini"`,
-		`agent-mode = "planner"`,
 		"max-iterations = 7",
 		`specs-dir = "docs/specs"`,
 		`specs-index-file = "INDEX.md"`,
 		`implementation-plan-name = "PLAN.md"`,
 		`prompts-dir = ".ralph/custom-prompts"`,
-		`log-file = "./logs/custom.log"`,
 		"log-truncate = true",
 	}
 }
 
 func seededInitPromptDefaults() []string {
 	return []string{
-		"AI agent (opencode/claude/cursor) [claude]:",
+		"Overwrite existing configuration? [no]:",
+		"AI agent (omp/opencode/claude/cursor/oh-my-pi) [claude]:",
 		"Model (optional) [gpt-4o-mini]:",
-		"Agent mode/sub-agent (optional) [planner]:",
+		"Agent mode/sub-agent (optional):",
 		"Maximum iterations [7]:",
 		"Specs directory [docs/specs]:",
 		"Specs index file [INDEX.md]:",
 		"Implementation plan file [PLAN.md]:",
 		"Prompts directory [.ralph/custom-prompts]:",
-		"Log file path (optional) [./logs/custom.log]:",
-		"Truncate log file on each run? [yes]:",
+		"Log file path (leave empty to disable logging):",
+		"Configuration preview:",
 		"Write configuration now? [yes]:",
 	}
 }
@@ -314,6 +327,7 @@ func assertOutputContainsAll(t *testing.T, output string, expectedFragments []st
 		}
 	}
 }
+
 
 func TestInitCommandSeedsQuestionDefaultsFromExistingConfig(t *testing.T) {
 	tmp := t.TempDir()

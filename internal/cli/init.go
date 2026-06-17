@@ -70,7 +70,7 @@ const (
 	questionKeyWriteConfiguration     = "write-configuration"
 )
 
-var supportedInitAgents = []string{"omp", "opencode", "claude", "cursor"}
+var supportedInitAgents = []string{"omp", "opencode", "claude", "cursor", "oh-my-pi"}
 
 var errInvalidConfirmAnswer = errors.New("please answer yes or no")
 
@@ -336,12 +336,12 @@ func seedInitStringDefaults(answers *InitAnswers, existingConfig *config.Config)
 		apply func(string)
 	}{
 		{existingConfig.Model, func(value string) { answers.Model = value }},
-		{existingConfig.AgentMode, func(value string) { answers.AgentMode = value }},
+		// AgentMode intentionally omitted - always shows no default
 		{existingConfig.SpecsDir, func(value string) { answers.SpecsDir = value }},
 		{existingConfig.SpecsIndexFile, func(value string) { answers.SpecsIndexFile = value }},
 		{existingConfig.ImplementationPlanName, func(value string) { answers.ImplementationPlanName = value }},
 		{existingConfig.PromptsDir, func(value string) { answers.PromptsDir = value }},
-		{existingConfig.LogFile, func(value string) { answers.LogFile = value }},
+		// LogFile intentionally omitted - always shows no default
 	} {
 		if strings.TrimSpace(field.value) == "" {
 			continue
@@ -509,7 +509,7 @@ func baseInitQuestions(defaults *InitAnswers) []InitQuestion {
 	return []InitQuestion{
 		newSelectQuestion(
 			questionKeyAgentName,
-			"AI agent (opencode/claude/cursor)",
+			"AI agent (omp/opencode/claude/cursor/oh-my-pi)",
 			defaults.AgentName,
 			supportedInitAgents,
 			validateInitAgent,
@@ -533,7 +533,7 @@ func baseInitQuestions(defaults *InitAnswers) []InitQuestion {
 			nil,
 		),
 		newInputQuestion(questionKeyPromptsDir, "Prompts directory", defaults.PromptsDir, true, nil),
-		newInputQuestion(questionKeyLogFile, "Log file path (optional)", defaults.LogFile, false, nil),
+		newInputQuestion(questionKeyLogFile, "Log file path (leave empty to disable logging)", defaults.LogFile, false, nil),
 	}
 }
 

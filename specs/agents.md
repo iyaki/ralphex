@@ -74,6 +74,7 @@ specs/
 - Opencode: [specs/agents/opencode.md](agents/opencode.md)
 - Claude: [specs/agents/claude.md](agents/claude.md)
 - Cursor: [specs/agents/cursor.md](agents/cursor.md)
+- Oh My Pi (oh-my-pi): [specs/agents/oh-my-pi.md](agents/oh-my-pi.md)
 
 ## Data model
 

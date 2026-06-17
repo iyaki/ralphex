@@ -1,16 +1,8 @@
-agent = "opencode"
-# model = "gpt-4"
-# Optional agent mode/sub-agent (if supported by the CLI)
-agent-mode = "ralph"
-
-# Iteration Settings
-max-iterations = 25
-
-# Directory Settings
+max-iterations = 50
 specs-dir = "specs"
 specs-index-file = "README.md"
+no-specs-index = false
 implementation-plan-name = "IMPLEMENTATION_PLAN.md"
+log-file = ".ralph/logs"
 prompts-dir = ".ralph/prompts"
-
-# Logging Configuration
-log-file = "logs/ralph.log"
+agent = "oh-my-pi"

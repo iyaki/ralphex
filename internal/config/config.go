@@ -38,22 +38,22 @@ const (
 
 // Config holds all Ralph configuration.
 type Config struct {
-	ConfigFile             string                          `toml:"config-file"`
+	ConfigFile             string                          `toml:"config-file,omitempty"`
 	MaxIterations          int                             `toml:"max-iterations"`
-	PromptFile             string                          `toml:"prompt-file"`
+	PromptFile             string                          `toml:"prompt-file,omitempty"`
 	SpecsDir               string                          `toml:"specs-dir"`
 	SpecsIndexFile         string                          `toml:"specs-index-file"`
 	NoSpecsIndex           bool                            `toml:"no-specs-index"`
 	ImplementationPlanName string                          `toml:"implementation-plan-name"`
-	LogFile                string                          `toml:"log-file"`
-	LogTruncate            bool                            `toml:"log-truncate"`
-	CustomPrompt           string                          `toml:"custom-prompt"`
+	LogFile                string                          `toml:"log-file,omitempty"`
+	LogTruncate            bool                            `toml:"log-truncate,omitempty"`
+	CustomPrompt           string                          `toml:"custom-prompt,omitempty"`
 	PromptsDir             string                          `toml:"prompts-dir"`
 	AgentName              string                          `toml:"agent"`
-	Model                  string                          `toml:"model"`
-	AgentMode              string                          `toml:"agent-mode"`
-	Env                    map[string]string               `toml:"env"`
-	PromptOverrides        map[string]PromptConfigOverride `toml:"prompt-overrides"`
+	Model                  string                          `toml:"model,omitempty"`
+	AgentMode              string                          `toml:"agent-mode,omitempty"`
+	Env                    map[string]string               `toml:"env,omitempty"`
+	PromptOverrides        map[string]PromptConfigOverride `toml:"prompt-overrides,omitempty"`
 
 	configLoaded bool
 }

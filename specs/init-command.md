@@ -168,20 +168,21 @@ specs/
 
 | Prompt                                    | Config key                 | Type    | Default                  | Validation                      |
 | ----------------------------------------- | -------------------------- | ------- | ------------------------ | ------------------------------- |
-| AI agent (`omp`, `opencode`, `claude`, `cursor`) | `agent`                    | select  | `opencode`               | Must be one of supported agents |
-| Model (optional)                          | `model`                    | input   | empty                    | Free text; empty allowed        |
-| Agent mode/sub-agent (optional)           | `agent-mode`               | input   | empty                    | Free text; empty allowed        |
+| AI agent (`omp`, `opencode`, `claude`, `cursor`, `oh-my-pi`) | `agent`                    | select  | `opencode`               | Must be one of supported agents |
+| Model (optional)                          | `model`                    | input   | empty (not written)      | Free text; empty allowed        |
+| Agent mode/sub-agent (optional)           | `agent-mode`               | input   | empty (not written)      | Free text; empty allowed        |
 | Maximum iterations                        | `max-iterations`           | input   | `25`                     | Integer > 0                     |
 | Specs directory                           | `specs-dir`                | input   | `specs`                  | Non-empty path                  |
 | Specs index file                          | `specs-index-file`         | input   | `README.md`              | Non-empty file name             |
 | Implementation plan file                  | `implementation-plan-name` | input   | `IMPLEMENTATION_PLAN.md` | Non-empty file name             |
 | Prompts directory                         | `prompts-dir`              | input   | `.ralph/prompts`         | Non-empty path                  |
-| Log file path (optional)                  | `log-file`                 | input   | `` (empty = disabled)    | Non-empty path (optional)       |
+| Log file path (leave empty to disable logging) | `log-file`                 | input   | `` (empty = disabled)    | Non-empty path (optional)       |
 
 ### Generated TOML behavior
 
 - Answers are converted into config keys defined in [specs/configuration.md](configuration.md).
 - Writes use atomic temp-file + rename semantics through `internal/config/writer.go`.
+- Optional fields with empty values (model, agent-mode, log-file) are omitted from the generated TOML file.
 
 ## Permissions
 
@@ -217,7 +218,6 @@ specs/
 - A generated config is loaded successfully by existing config resolution logic.
 
 ## Appendices
-
 ### Example generated config (accept defaults)
 
 ```toml
@@ -226,5 +226,6 @@ max-iterations = 25
 specs-dir = "specs"
 specs-index-file = "README.md"
 implementation-plan-name = "IMPLEMENTATION_PLAN.md"
+prompts-dir = ".ralph/prompts"
 log-truncate = false
 ```

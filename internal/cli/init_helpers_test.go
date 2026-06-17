@@ -202,7 +202,7 @@ func TestSeedInitMaxIterationsDefault(t *testing.T) {
 }
 
 func TestSeedInitStringDefaults(t *testing.T) {
-	t.Run("populate existing config fields", func(t *testing.T) {
+	t.Run("populate existing config fields except AgentMode and LogFile", func(t *testing.T) {
 		var answers InitAnswers
 		existingConfig := &config.Config{
 			Model:                  "gpt-4",
@@ -219,8 +219,8 @@ func TestSeedInitStringDefaults(t *testing.T) {
 		if answers.Model != "gpt-4" {
 			t.Errorf("expected Model \"gpt-4\", got %q", answers.Model)
 		}
-		if answers.AgentMode != "agent" {
-			t.Errorf("expected AgentMode \"agent\", got %q", answers.AgentMode)
+		if answers.AgentMode != "" {
+			t.Errorf("expected AgentMode \"\" (omitted), got %q", answers.AgentMode)
 		}
 		if answers.SpecsDir != "my-specs" {
 			t.Errorf("expected SpecsDir \"my-specs\", got %q", answers.SpecsDir)
@@ -234,8 +234,8 @@ func TestSeedInitStringDefaults(t *testing.T) {
 		if answers.PromptsDir != "my-prompts" {
 			t.Errorf("expected PromptsDir \"my-prompts\", got %q", answers.PromptsDir)
 		}
-		if answers.LogFile != "/my/log.log" {
-			t.Errorf("expected LogFile \"/my/log.log\", got %q", answers.LogFile)
+		if answers.LogFile != "" {
+			t.Errorf("expected LogFile \"\" (omitted), got %q", answers.LogFile)
 		}
 	})
 }

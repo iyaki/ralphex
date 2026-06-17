@@ -174,3 +174,44 @@ func TestWriteConfig_SuccessAndVerify(t *testing.T) {
 		t.Error("expected max-iterations in output")
 	}
 }
+
+func TestWriteConfig_EmptyStringsShouldBeOmitted(t *testing.T) {
+	tmpDir := t.TempDir()
+	path := filepath.Join(tmpDir, "test.toml")
+	cfg := &config.Config{
+		AgentName:              "opencode",
+		Model:                  "gpt-4",
+		AgentMode:              "reviewer",
+		MaxIterations:          25,
+		SpecsDir:               "specs",
+		SpecsIndexFile:         "README.md",
+		ImplementationPlanName: "IMPLEMENTATION_PLAN.md",
+		PromptsDir:             ".ralph/prompts",
+		LogFile:                "ralph.log",
+		LogTruncate:            false,
+	}
+	
+	err := config.WriteConfig(path, cfg)
+	if err != nil {
+		t.Fatalf("WriteConfig failed: %v", err)
+	}
+	
+	content, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile failed: %v", err)
+	}
+	
+	contentStr := string(content)
+	t.Logf("Generated TOML:\n%s", contentStr)
+	
+	// Should NOT contain empty string values
+	if strings.Contains(contentStr, `config-file = ""`) {
+		t.Error("Config file should not write empty config-file field")
+	}
+	if strings.Contains(contentStr, `prompt-file = ""`) {
+		t.Error("Config file should not write empty prompt-file field")
+	}
+	if strings.Contains(contentStr, `custom-prompt = ""`) {
+		t.Error("Config file should not write empty custom-prompt field")
+	}
+}
