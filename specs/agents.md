@@ -115,7 +115,7 @@ specs/
 
 1. Build CLI arguments from `Model` and `AgentMode`.
 2. Execute the agent CLI with the prompt as a final argument.
-3. Capture stdout and stderr; return combined output.
+3. Capture stdout and stderr; return combined output. Output is monitored for the completion signal `<promise>COMPLETE</promise>` to determine when the loop should stop.
 
 ### Execute agent (CLI missing)
 

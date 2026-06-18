@@ -91,7 +91,7 @@ specs/
 3. Prompt resolver selects inline prompt, stdin, prompt file, or built-in prompt (see prompts spec).
 4. The loop injects the completion signal and runs agent iterations (see agents spec).
 5. Agent output is streamed to stdout and optionally to the log file (see logging spec).
-6. Completion is detected by searching for `<promise>COMPLETE</promise>` in output.
+6. Completion is detected by searching for `<promise>COMPLETE</promise>` in output. See [Prompts spec](prompts.md#completion-signal) for details on the completion signal mechanism.
 
 ## Data model
 

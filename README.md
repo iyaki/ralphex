@@ -297,6 +297,36 @@ ralph --no-log=false --log-file ./ralph.log --log-truncate build
 RALPH_LOG_ENABLED=1 RALPH_LOG_APPEND=0 ralph build
 ```
 
+## Completion Signal
+
+Ralph detects task completion by searching for the following XML-like tag in agent output:
+
+```xml
+<promise>COMPLETE</promise>
+```
+
+The built-in `build` and `plan` prompts use the placeholder `<COMPLETION_SIGNAL>`, which Ralph automatically replaces with `<promise>COMPLETE</promise>` at runtime before sending the prompt to the agent.
+
+When creating custom prompts (inline via `--prompt` or in prompt files), you can either:
+
+1. Use the placeholder `<COMPLETION_SIGNAL>` — Ralph will replace it for you:
+   ```markdown
+   Implement feature X.
+   Write tests for Y.
+   When everything is done, output: <COMPLETION_SIGNAL>
+   ```
+
+2. Or directly include the actual signal:
+   ```markdown
+   Implement feature X.
+   Write tests for Y.
+   When everything is done, output: <promise>COMPLETE</promise>
+   ```
+
+The tag is case-sensitive and must appear exactly as shown. Ralph will stop after detecting the first occurrence.
+
+> [!TIP]
+> For technical details on the completion signal mechanism, see [specs/prompts.md#completion-signal](specs/prompts.md#completion-signal).
 > [!CAUTION]
 > Prompt text and agent output are written to stdout and, when logging is enabled, to the configured log file. Treat prompt files, config overrides, and logs as sensitive.
 

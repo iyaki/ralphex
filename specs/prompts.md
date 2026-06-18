@@ -167,6 +167,33 @@ Note: prompt resolution behavior is independent of command routing. Routing and 
 - `ralph run plan` uses built-in plan prompt when no file exists.
 - `ralph init` executes init subcommand, while `ralph run init` resolves prompt `init`.
 
+## Completion Signal
+
+Ralph detects task completion by searching for the following XML-like tag in agent output:
+
+```xml
+<promise>COMPLETE</promise>
+```
+
+The built-in `build` and `plan` prompts use the placeholder `<COMPLETION_SIGNAL>`, which Ralph automatically replaces with `<promise>COMPLETE</promise>` at runtime before sending the prompt to the agent.
+
+When creating custom prompts (inline via `--prompt` or in prompt files), you can either:
+
+1. Use the placeholder `<COMPLETION_SIGNAL>` — Ralph will replace it for you:
+   ```markdown
+   Implement feature X.
+   Write tests for Y.
+   When everything is done, output: <COMPLETION_SIGNAL>
+   ```
+
+2. Or directly include the actual signal:
+   ```markdown
+   Implement feature X.
+   Write tests for Y.
+   When everything is done, output: <promise>COMPLETE</promise>
+   ```
+
+The tag is case-sensitive and must appear exactly as shown. Ralph will stop after detecting the first occurrence.
 ## Appendices
 
 ### Built-in prompt behavior (summary)
@@ -174,9 +201,9 @@ Note: prompt resolution behavior is independent of command routing. Routing and 
 - Build prompt:
   - Instructs to study specs and the implementation plan.
   - Requires implementing a single task, validating, updating plan, and committing.
-  - Includes a completion signal placeholder `<COMPLETION_SIGNAL>`.
++  - Injects the completion signal `<promise>COMPLETE</promise>` automatically. See [Completion Signal](#completion-signal) for details on custom prompts.
 
 - Plan prompt:
   - Instructs to generate/update the implementation plan in a structured format.
   - Requires study/gap analysis against specs and code.
-  - Includes a completion signal placeholder `<COMPLETION_SIGNAL>`.
++  - Injects the completion signal `<promise>COMPLETE</promise>` automatically. See [Completion Signal](#completion-signal) for details on custom prompts.
