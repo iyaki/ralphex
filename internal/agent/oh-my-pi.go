@@ -14,7 +14,7 @@ type OmpAgent struct {
 // Execute runs omp with the given prompt.
 // omp CLI uses: omp launch --print [--model <model>] <prompt>.
 func (a *OmpAgent) Execute(prompt string, output io.Writer) (string, error) {
-	args := []string{"--print", "--no-title"}
+	args := []string{"--print", "--no-title", "--no-session"}
 	if a.Model != "" {
 		args = append(args, "--model", a.Model)
 	}
