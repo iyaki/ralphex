@@ -127,13 +127,14 @@ This gap makes it slightly harder for users to create their first custom prompt 
 - 2026-06-18: Read `internal/cli/cmd.go` - identified `Long` field as target for help text enhancement; tests run: none; files touched: `internal/cli/cmd.go`.
 - 2026-06-18: Memory recall - confirmed prior discussion about exposing completion signal in documentation; user requested showing the actual snippet pattern; tests run: none; files touched: none.
 - 2026-06-18: `make build` - build successful; `go test ./internal/cli` - all tests pass; `./bin/ralph --help` - custom prompt examples visible; `make test` - full test suite passes; files touched: `internal/cli/cmd.go`, `IMPLEMENTATION_PLAN.md`.
+- 2026-06-18: `go test ./cmd/ralph -run TestReadmeDocumentsRalphexRepoAndRalphCli -count=1` - test passes; `make test` - full suite passes; README updated with "Creating Custom Prompts" section showing inline and file-based examples; files touched: `README.md`, `cmd/ralph/main_test.go`, `IMPLEMENTATION_PLAN.md`.
 | Phase | Goal | Status |
 | --- | --- | --- |
 | Phase 1 | Add custom prompt example to help text | `[x]` Complete |
-| Phase 2 | Update README with example | `[ ]` Not started |
+| Phase 2 | Update README with example | `[x]` Complete |
 | Phase 3 | Verification | `[x]` Complete |
 
-**Remaining effort:** Phase 1 complete. Phase 2 (README update) and Phase 3 (verification) remain for future work.
+**Remaining effort:** All phases complete. Custom prompt examples now visible in both help text (`ralph --help`) and README documentation.
 
 ## Known Existing Work
 
