@@ -20,6 +20,7 @@ Status: Implemented
 - Package manager publishing (Homebrew, apt, scoop).
 - Code signing and notarization.
 - Container image publishing.
+- Detached signatures (.sig files) for release artifacts.
 
 ### Scope
 
@@ -139,11 +140,6 @@ Status: Implemented
 | `actions/upload-artifact`     | Persist matrix build outputs    |
 | `actions/download-artifact`   | Collect outputs for publishing  |
 | `softprops/action-gh-release` | Create/update GitHub Release    |
-
-## Open questions / risks
-
-- Should future releases include detached signatures (for example, `.sig` files)?
-- Should Windows arm64 be included as a supported build target?
 
 ## Verifications
 
