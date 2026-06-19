@@ -142,45 +142,16 @@ It checks for security issues and performance.
 		t.Errorf("expected output to mention 'review' prompt, got %q", output)
 	}
 }
-
 func TestPromptsShowBuild(t *testing.T) {
-	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get cwd: %v", err)
-	}
-	tmp := t.TempDir()
-	if err := os.Chdir(tmp); err != nil {
-		t.Fatalf("failed to chdir: %v", err)
-	}
-	t.Cleanup(func() {
-		_ = os.Chdir(wd)
-	})
-
-	homeDir := t.TempDir()
-	t.Setenv("HOME", homeDir)
-
-	cmd := cli.NewPromptsShowCommand()
-	cmd.SetArgs([]string{"build"})
-	var out bytes.Buffer
-	cmd.SetOut(&out)
-
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("expected execute success, got: %v", err)
-	}
-
-	output := out.String()
-	if !strings.Contains(output, "Agent Instructions (Build Mode)") {
-		t.Errorf("expected output to contain build prompt header, got %q", output)
-	}
-	if !strings.Contains(output, "Study `specs/*`") {
-		t.Errorf("expected output to mention studying specs, got %q", output)
-	}
-	if !strings.Contains(output, "IMPLEMENTATION_PLAN.md") {
-		t.Errorf("expected output to mention implementation plan, got %q", output)
-	}
+	testPromptsShow(t, "build", "Agent Instructions (Build Mode)")
 }
 
 func TestPromptsShowPlan(t *testing.T) {
+	testPromptsShow(t, "plan", "Agent Instructions (Planning Mode)")
+}
+
+func testPromptsShow(t *testing.T, promptName, expectedHeader string) {
+	t.Helper()
 	wd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("failed to get cwd: %v", err)
@@ -197,7 +168,7 @@ func TestPromptsShowPlan(t *testing.T) {
 	t.Setenv("HOME", homeDir)
 
 	cmd := cli.NewPromptsShowCommand()
-	cmd.SetArgs([]string{"plan"})
+	cmd.SetArgs([]string{promptName})
 	var out bytes.Buffer
 	cmd.SetOut(&out)
 
@@ -206,8 +177,8 @@ func TestPromptsShowPlan(t *testing.T) {
 	}
 
 	output := out.String()
-	if !strings.Contains(output, "Agent Instructions (Planning Mode)") {
-		t.Errorf("expected output to contain plan prompt header, got %q", output)
+	if !strings.Contains(output, expectedHeader) {
+		t.Errorf("expected output to contain %q, got %q", expectedHeader, output)
 	}
 	if !strings.Contains(output, "Study `specs/*`") {
 		t.Errorf("expected output to mention studying specs, got %q", output)
@@ -216,6 +187,7 @@ func TestPromptsShowPlan(t *testing.T) {
 		t.Errorf("expected output to mention implementation plan, got %q", output)
 	}
 }
+
 
 func TestPromptsShowNonExistent(t *testing.T) {
 	wd, err := os.Getwd()

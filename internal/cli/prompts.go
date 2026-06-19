@@ -1,4 +1,3 @@
-// Package cli provides CLI commands for Ralphex.
 package cli
 
 import (
@@ -34,7 +33,7 @@ func NewPromptsListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List available prompts",
 		Long:  `List all available built-in and custom prompts with descriptions.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			var cfg config.Config
 			if err := cfg.LoadConfig(); err != nil {
 				return fmt.Errorf("failed to load config: %w", err)
@@ -59,6 +58,7 @@ func NewPromptsShowCommand() *cobra.Command {
 			}
 
 			promptName := args[0]
+
 			return runPromptsShow(cmd.OutOrStdout(), &cfg, promptName)
 		},
 	}
@@ -72,23 +72,30 @@ type promptInfo struct {
 
 func runPromptsList(output io.Writer, cfg *config.Config) error {
 	// Display built-in prompts
-	fmt.Fprintln(output, "Built-in Prompts:")
-	fmt.Fprintf(output, "  build      %s\n", truncateString("Implement a single task from IMPLEMENTATION_PLAN.md after studying specs, then validate, commit, and update the plan.", 80))
-	fmt.Fprintf(output, "  plan       %s\n", truncateString("Generate or update IMPLEMENTATION_PLAN.md with a phase-based plan after studying specs, existing code, and identifying gaps.", 80))
+	const (
+		maxDescLen  = 80
+		maxShortLen = 70
+	)
+	buildDesc := "Implement a task from IMPLEMENTATION_PLAN.md after studying specs, then validate, commit, update plan."
+	planDesc := "Generate/update IMPLEMENTATION_PLAN.md with phase-based plan after studying specs and gaps."
+
+	_, _ = fmt.Fprintln(output, "Built-in Prompts:")
+	_, _ = fmt.Fprintf(output, "  build      %s\n", truncateString(buildDesc, maxDescLen))
+	_, _ = fmt.Fprintf(output, "  plan       %s\n", truncateString(planDesc, maxDescLen))
 
 	// Discover custom prompts
 	customPrompts := discoverCustomPrompts(cfg)
 	if len(customPrompts) > 0 {
-		fmt.Fprintln(output, "")
-		fmt.Fprintln(output, "Custom Prompts:")
+		_, _ = fmt.Fprintln(output, "")
+		_, _ = fmt.Fprintln(output, "Custom Prompts:")
 		for _, p := range customPrompts {
-			fmt.Fprintf(output, "  %-10s %s\n", p.Name, truncateString(p.Desc, 70))
-			fmt.Fprintf(output, "             %s\n", p.Path)
+			_, _ = fmt.Fprintf(output, "  %-10s %s\n", p.Name, truncateString(p.Desc, maxShortLen))
+			_, _ = fmt.Fprintf(output, "             %s\n", p.Path)
 		}
 	}
 
-	fmt.Fprintln(output, "")
-	fmt.Fprintln(output, "Use 'ralph run <prompt-name>' to execute a prompt.")
+	_, _ = fmt.Fprintln(output, "")
+	_, _ = fmt.Fprintln(output, "Use 'ralph run <prompt-name>' to execute a prompt.")
 
 	return nil
 }
@@ -149,16 +156,17 @@ func extractDescription(path string) string {
 		if len(trimmed) > 0 && trimmed[0] == '#' {
 			continue
 		}
+
 		return trimmed
 	}
 
 	return "(no description)"
 }
-
 func truncateString(s string, maxLen int) string {
 	if len(s) <= maxLen {
 		return s
 	}
+
 	// Add ellipsis
 	return s[:maxLen-3] + "..."
 }
@@ -167,11 +175,13 @@ func runPromptsShow(output io.Writer, cfg *config.Config, promptName string) err
 	// Try built-in prompts first
 	switch promptName {
 	case "build":
-		fmt.Fprint(output, prompt.BuildPrompt(cfg))
+		_, _ = fmt.Fprint(output, prompt.BuildPrompt(cfg))
+
 		return nil
 	case "plan":
 		// Plan prompt needs a scope - use empty string for display
-		fmt.Fprint(output, prompt.PlanPrompt(cfg, ""))
+		_, _ = fmt.Fprint(output, prompt.PlanPrompt(cfg, ""))
+
 		return nil
 	}
 
@@ -193,7 +203,8 @@ func runPromptsShow(output io.Writer, cfg *config.Config, promptName string) err
 		return fmt.Errorf("failed to parse front matter in %q: %w", foundPath, err)
 	}
 
-	fmt.Fprint(output, body)
+	_, _ = fmt.Fprint(output, body)
+
 	return nil
 }
 
