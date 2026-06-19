@@ -130,6 +130,8 @@ ralph --env HTTP_PROXY=http://127.0.0.1:8080 build
 | `ralph` | Equivalent to `ralph run build` |
 | `ralph run [prompt] [scope]` | Explicit loop entrypoint |
 | `ralph <prompt> [scope]` | Alias to `ralph run <prompt> [scope]` when `<prompt>` is not a subcommand |
+| `ralph prompts list` | List all available built-in and custom prompts |
+| `ralph prompts show <name>` | Display full content of a specific prompt |
 | `ralph init` | Generate a starter config file |
 | `ralph run init` | Run a prompt named `init` |
 | `ralph version` | Print the version number |
@@ -139,6 +141,15 @@ Useful examples:
 ```bash
 # Built-in planning prompt
 ralph plan payment-service
+
+# List available prompts
+ralph prompts list
+
+# View the full build prompt
+ralph prompts show build
+
+# View the full plan prompt
+ralph prompts show plan
 
 # Explicit run command
 ralph run build
@@ -169,6 +180,36 @@ ralph init --force
 ```
 
 The generated starter config disables logging by default (log file is empty). Users can enable logging during the interactive questionnaire by providing a log file path. The default prompts directory is set to `.ralph/prompts` so prompt files can live inside the repository.
+
+### `ralph prompts`
+
+The `prompts` command helps you discover and inspect built-in and custom prompts.
+
+```bash
+# List all available prompts
+ralph prompts list
+
+# View the full content of the build prompt
+ralph prompts show build
+
+# View the full content of the plan prompt
+ralph prompts show plan
+
+# View a custom prompt file
+ralph prompts show review
+```
+
+The `prompts list` subcommand displays:
+- Built-in Prompts: `build` and `plan` with brief descriptions
+- Custom Prompts: Any prompt files found in the configured prompts directory with their file paths
+
+This command is useful when you want to:
+- Inspect built-in prompts to understand what instructions Ralphex sends to the agent
+- Review custom prompts before using them
+- Discover available prompts in your repository
+- Debug prompt content without actually running the agent loop
+
+The full prompt content is displayed exactly as it would be sent to the agent (with frontmatter stripped for custom prompts), making it easy to verify your prompt configuration or understand the default behavior.
 
 ## Creating Custom Prompts
 

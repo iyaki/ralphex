@@ -1,6 +1,6 @@
 # Prompts Command
 
-Status: Proposed
+Status: Implemented
 
 ## Overview
 
@@ -141,3 +141,51 @@ For custom prompt files, the description is extracted using the following preced
 
 - [prompts.md](../prompts.md) — Prompt resolution and content generation.
 - [run.md](run.md) — Using prompts with the `run` command.
+## Implementation Notes
+
+The prompts command was implemented with the following features:
+
+### prompts list
+- Lists built-in prompts (build and plan) with their descriptions
+- Discovers custom prompts by scanning the configured PromptsDir
+- Truncates descriptions to 80 characters for readability
+- Provides usage hint to execute prompts with ralph run prompt-name
+
+### prompts show name
+- For built-in prompts: generates and displays the full prompt content
+- For custom prompts: reads and displays file content with frontmatter stripped
+- Returns error if prompt is not found
+
+### Usage Examples
+
+```bash
+# List all available prompts
+$ ralph prompts list
+Built-in Prompts:
+  build      Implement a single task from IMPLEMENTATION_PLAN.md after studying specs...
+  plan       Generate or update IMPLEMENTATION_PLAN.md with a phase-based plan after study...
+
+Use 'ralph run <prompt-name>' to execute a prompt.
+
+# View the build prompt
+$ ralph prompts show build
+# Agent Instructions (Build Mode)
+
+- Study specs/* (including specs/README.md and related specs).
+- Study IMPLEMENTATION_PLAN.md and pick the single most important task.
+...
+
+# View the plan prompt
+$ ralph prompts show plan
+# Agent Instructions (Planning Mode)
+...
+```
+
+## Verifications
+
+The following verifications confirm the command works as specified:
+
+- ralph prompts list - shows built-in prompts with descriptions (DONE)
+- ralph prompts show build - displays full build prompt content (DONE)
+- ralph prompts show plan - displays full plan prompt content (DONE)
+- Command visible in ralph --help under Available Commands (DONE)

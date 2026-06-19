@@ -19,7 +19,7 @@ Status: Implemented
 
 - Defining new prompt types or templates.
 - Editing prompt content beyond what is implemented in code.
-- CLI command behavior (see [commands/prompts.md](commands/prompts.md)).
+- Prompt discovery or listing CLI behavior (see [commands/prompts.md](commands/prompts.md)).
 
 ### Scope
 
@@ -212,6 +212,6 @@ The tag is case-sensitive and must appear exactly as shown. Ralph will stop afte
 
 ## Related Specifications
 
-- [commands/prompts.md](commands/prompts.md) — CLI `prompts` command for listing and viewing prompts.
+- [commands/prompts.md](commands/prompts.md) — CLI `prompts` command for listing and viewing prompts. Use `ralph prompts list` to discover available prompts and `ralph prompts show <name>` to inspect full prompt content.
 - [commands/run.md](commands/run.md) — Using prompts with the `run` command.
 - [configuration.md](configuration.md) — Configuration fields used in prompt resolution.
