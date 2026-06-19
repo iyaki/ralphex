@@ -1,6 +1,21 @@
 {
   "version": 1,
   "skills": {
+    "agent-implementation": {
+      "source": "iyaki/specralph",
+      "sourceType": "github",
+      "computedHash": "013dbb0f474c173e0ba6f631390f3ae4e1ff2c9f55e6f53a2f4d5a785d4c7ac3"
+    },
+    "agent-spec-creation": {
+      "source": "iyaki/specralph",
+      "sourceType": "github",
+      "computedHash": "7e45cfb1ba8197f90db348f4df78c8febca5e0f3cc2766494a3a5a1f5b0a4e2d"
+    },
+    "spec-creator": {
+      "source": "iyaki/specralph",
+      "sourceType": "github",
+      "computedHash": "eb406e3d5b902e98debaafcb34bd0d241c89bbefe9dd183db3ba540a163493af"
+    },
     "create-readme": {
       "source": "github/awesome-copilot",
       "sourceType": "github",
