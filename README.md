@@ -1,22 +1,18 @@
-# SpecRalph - Spec-Driven Ralph-Wiggum Loops
+# SpecRalph - Spec-Driven Ralph-Wiggum Agentic AI Loops
 
 [![GitHub Release](https://img.shields.io/github/v/release/iyaki/specralph)](https://github.com/iyaki/specralph/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/iyaki/specralph/quality.yml)](https://github.com/iyaki/specralph/actions)
 [![License](https://img.shields.io/github/license/iyaki/specralph)](LICENSE)
 
-Specralph is a specs-first CLI for running iterative AI coding loops against external agent CLIs such as OpenCode, Claude Code, and Cursor. It gives you built-in `plan` and `build` prompts, deterministic configuration precedence, and a simple command model that works well in repository-driven workflows.
+SpecRalph (formerly Ralphex) is a **spec-driven AI coding automation CLI** for developers. It orchestrates iterative development loops with external agent CLIs like **Claude Code, OpenCode, Cursor, and Oh My Pi**. Built with **Go** for **cross-platform** support (Linux, macOS, Windows), SpecRalph implements the [Ralph Wiggum methodology](https://ghuntley.com/ralph/) for **AI-assisted software development**: define specs, generate implementation plans, and execute automated coding loops until completion.
 
-It wraps a supported agent CLI in a repeatable loop: resolve a prompt, run the agent, and repeat until the agent emits `<promise>COMPLETE</promise>` or max iterations is reached. Each pass works against the updated repository, which makes it a good fit for specs, implementation plans, and repository-local prompts.
-
-## What is Specralph?
-
-**Specralph is a spec-driven AI coding automation CLI** that orchestrates iterative development loops with external agent CLIs like Claude Code, OpenCode, Cursor, and Oh My Pi. Built with Go for cross-platform support (Linux, macOS, Windows), and brings the [Ralph Wiggum methodology](https://ghuntley.com/ralph/) to AI-assisted development: define specs, generate implementation plans, and execute automated coding loops until completion.
+SpecRalph wraps a supported agent CLI in a repeatable loop: resolve a prompt, run the agent, and repeat until the agent emits `<promise>COMPLETE</promise>` or max iterations is reached. Each pass works against the updated repository, which makes it a good fit for specs, implementation plans, and repository-local prompts.
 
 > [!NOTE]
 > The repository is `iyaki/specralph`, but the CLI command remains `ralph`.
 
 > [!IMPORTANT]
-> Specralph does not bundle an agent runtime. Install and authenticate a supported agent CLI separately, then make sure its binary is available on your `PATH`.
+> SpecRalph does not bundle an agent runtime. Install and authenticate a supported agent CLI separately, then make sure its binary is available on your `PATH`.
 
 ## Table of Contents
 
@@ -42,6 +38,10 @@ It wraps a supported agent CLI in a repeatable loop: resolve a prompt, run the a
 - Applies predictable precedence across flags, environment variables, config files, and prompt front matter.
 - Keeps repository-specific prompts and local overrides easy to manage.
 - Fits the Ralph Wiggum style of specs-first development.
+
+## Why Spec-Driven?
+
+Spec-driven development reduces ambiguity and keeps AI agents focused on concrete requirements.
 
 ## Supported Agents
 
@@ -426,7 +426,12 @@ npx skills add https://github.com/iyaki/specralph/ --skill spec-creator
 
 ## Contributing
 
-[See CONTRIBUTING.md](CONTRIBUTING.md)
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for:
+
+- Development setup and prerequisites
+- Specs-first workflow guidelines
+- Testing and quality gates
+- How to add support for new agents
 
 ## License
 
