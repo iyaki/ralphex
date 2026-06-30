@@ -52,6 +52,8 @@ Spec-driven development reduces ambiguity and keeps AI agents focused on concret
 | Cursor | `cursor` |
 | Oh My Pi | `omp` |
 | OpenAI Codex | `codex` |
+| GitHub Copilot | `copilot` |
+| Google Antigravity | `agy` |
 
 
 `model` and `agent-mode` are forwarded when the selected agent CLI supports them.
