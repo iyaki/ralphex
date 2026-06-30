@@ -68,13 +68,13 @@ specs/
 3. Availability check runs via `LookPath`.
 4. Agent executes the external CLI command and returns output.
 
-## Supported Agents
+Supported Agents
 
 - Oh My Pi (omp): [specs/agents/oh-my-pi.md](agents/oh-my-pi.md)
 - Opencode: [specs/agents/opencode.md](agents/opencode.md)
 - Claude: [specs/agents/claude.md](agents/claude.md)
 - Cursor: [specs/agents/cursor.md](agents/cursor.md)
-- Oh My Pi (oh-my-pi): [specs/agents/oh-my-pi.md](agents/oh-my-pi.md)
+- OpenAI Codex: [specs/agents/codex.md](agents/codex.md)
 
 ## Data model
 

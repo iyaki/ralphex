@@ -40,3 +40,4 @@ Design docs and technical specifications
 - [agents/claude.md](agents/claude.md)
 - [agents/cursor.md](agents/cursor.md)
 - [agents/oh-my-pi.md](agents/oh-my-pi.md)
+- [agents/codex.md](agents/codex.md) — OpenAI Codex CLI integration
