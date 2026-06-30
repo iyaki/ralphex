@@ -35,7 +35,11 @@ func GetAgent(agentName, model, agentMode string, env []string) (Agent, error) {
 		return &OpencodeAgent{Model: model, AgentMode: agentMode, Env: effectiveEnv}, nil
 	case "codex":
 		return &CodexAgent{Model: model, AgentMode: agentMode, Env: effectiveEnv}, nil
+	case "copilot":
+		return &CopilotAgent{Model: model, AgentMode: agentMode, Env: effectiveEnv}, nil
 	default:
-		return nil, fmt.Errorf("unknown agent %q (supported: omp, oh-my-pi, opencode, claude, cursor, codex)", agentName)
+		supported := "omp, oh-my-pi, opencode, claude, cursor, codex, copilot"
+
+		return nil, fmt.Errorf("unknown agent %q (supported: %s)", agentName, supported)
 	}
 }

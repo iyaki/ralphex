@@ -121,6 +121,7 @@ func TestGetAgentReturnsExpectedType(t *testing.T) {
 		{name: "cursor", agentName: "cursor", expected: "cursor"},
 		{name: "opencode", agentName: "opencode", expected: "opencode"},
 		{name: "codex", agentName: "codex", expected: "codex"},
+		{name: "copilot", agentName: "copilot", expected: "copilot"},
 	}
 
 	for _, tc := range tests {
@@ -156,6 +157,8 @@ func TestGetAgentCapturesEnvironmentSnapshot(t *testing.T) {
 		{name: "opencode", agentName: "opencode", command: "opencode"},
 		{name: "claude", agentName: "claude", command: "claude"},
 		{name: "cursor", agentName: "cursor", command: "cursor"},
+		{name: "codex", agentName: "codex", command: "codex"},
+		{name: "copilot", agentName: "copilot", command: "copilot"},
 	}
 
 	for _, tc := range tests {
@@ -558,4 +561,92 @@ func TestCodexExecuteWithoutOptionalFields(t *testing.T) {
 func TestCodexExecuteStreamsOutputInRealTime(t *testing.T) {
 	a := &agent.CodexAgent{}
 	testAgentExecutionStreamsOutputInRealTime(t, "codex", a.Execute)
+}
+func TestCopilotExecuteAndAvailability(t *testing.T) {
+	tmp := t.TempDir()
+	writeExecutable(t, tmp, "copilot", "#!/bin/sh\necho \"copilot:$*\"\n")
+	t.Setenv("PATH", tmp)
+
+	a := &agent.CopilotAgent{Model: "gpt-4o", AgentMode: "explore"}
+	if !a.IsAvailable() {
+		t.Fatal("expected copilot to be available")
+	}
+	if a.Name() != "copilot" {
+		t.Fatalf("unexpected name: %s", a.Name())
+	}
+
+	result, err := a.Execute("prompt", &bytes.Buffer{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	// Verify expected args are present
+	if !strings.Contains(result, "copilot:-p prompt --model gpt-4o") ||
+		!strings.Contains(result, "--sandbox enable") ||
+		!strings.Contains(result, "--agent explore") {
+		t.Fatalf("unexpected result: %q", result)
+	}
+
+	t.Setenv("PATH", t.TempDir())
+	if a.IsAvailable() {
+		t.Fatal("expected copilot to be unavailable")
+	}
+}
+
+func TestCopilotExecuteWithEnvironmentOverrides(t *testing.T) {
+	tmp := t.TempDir()
+	writeExecutable(t, tmp, "copilot", "#!/bin/sh\necho \"copilot:$*\"\n")
+	t.Setenv("PATH", tmp)
+	t.Setenv("COPILOT_SANDBOX", "disable")
+	t.Setenv("COPILOT_ALLOW_ALL", "true")
+	t.Setenv("COPILOT_AGENT", "research")
+	t.Setenv("COPILOT_RESUME", "true")
+
+	a := &agent.CopilotAgent{Model: "gpt-4o"}
+
+	result, err := a.Execute("prompt", &bytes.Buffer{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	// Check core flags with env overrides
+	if !strings.Contains(result, "copilot:-p prompt --model gpt-4o --sandbox disable --allow-all") {
+		t.Fatalf("unexpected result: %q", result)
+	}
+	if !strings.Contains(result, "--agent research") {
+		t.Fatalf("expected research agent, got %q", result)
+	}
+	if !strings.Contains(result, "--continue") {
+		t.Fatalf("expected continue flag, got %q", result)
+	}
+}
+
+func TestCopilotExecuteWithoutOptionalFields(t *testing.T) {
+	tmp := t.TempDir()
+	writeExecutable(t, tmp, "copilot", "#!/bin/sh\necho \"copilot:$*\"\n")
+	t.Setenv("PATH", tmp)
+
+	a := &agent.CopilotAgent{}
+
+	result, err := a.Execute("prompt", &bytes.Buffer{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	// Should have defaults: sandbox enable, no allow-all, no agent
+	if !strings.Contains(result, "copilot:-p prompt --sandbox enable") {
+		t.Fatalf("expected default args, got %q", result)
+	}
+	// Should NOT have --allow-all, --agent, or --continue by default
+	if strings.Contains(result, "--allow-all") {
+		t.Fatalf("expected no --allow-all flag, got %q", result)
+	}
+	if strings.Contains(result, "--agent") {
+		t.Fatalf("expected no --agent flag, got %q", result)
+	}
+	if strings.Contains(result, "--continue") {
+		t.Fatalf("expected no --continue flag, got %q", result)
+	}
+}
+
+func TestCopilotExecuteStreamsOutputInRealTime(t *testing.T) {
+	a := &agent.CopilotAgent{}
+	testAgentExecutionStreamsOutputInRealTime(t, "copilot", a.Execute)
 }
